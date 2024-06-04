@@ -1,26 +1,30 @@
 import 'package:app/componentes/decoracao_campo_autenticacao.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importe o pacote Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
 import 'package:app/telas/Tela_inicial.dart';
 import 'package:app/_comum/meu_snackbar.dart';
 import 'package:app/_comum/minhas_cores.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 
-class AlterarInfoCli extends StatefulWidget {
-  const AlterarInfoCli({Key? key});
+class AlterarInfotec extends StatefulWidget {
+  const AlterarInfotec({Key? key});
 
   @override
-  _AlterarInfoCliState createState() => _AlterarInfoCliState();
+  _AlterarInfotecState createState() => _AlterarInfotecState();
 }
 
-class _AlterarInfoCliState extends State<AlterarInfoCli> {
+class _AlterarInfotecState extends State<AlterarInfotec> {
   late TextEditingController _nomeController;
-  late TextEditingController _senhaAtualController; // Senha antiga
+  late TextEditingController _senhaAtualController;
   late TextEditingController _novaSenhaController;
   late TextEditingController _celularController;
   User? _user;
   String? _nomeAtual;
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -28,9 +32,25 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
     _user = FirebaseAuth.instance.currentUser;
     _nomeAtual = _user?.displayName;
     _nomeController = TextEditingController(text: _nomeAtual);
-    _senhaAtualController = TextEditingController(); // Inicialize o controlador para a senha antiga
+    _senhaAtualController = TextEditingController();
     _novaSenhaController = TextEditingController();
     _celularController = TextEditingController();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    if (_user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .get();
+
+      if (userDoc.exists && userDoc.data()!.containsKey('fotourl')) {
+        setState(() {
+          _imageUrl = userDoc['fotourl'];
+        });
+      }
+    }
   }
 
   Future<void> _deslogar(BuildContext context) async {
@@ -50,7 +70,6 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
       String newName, String oldPassword, String newSenha, String celular) async {
     try {
       if (_user != null) {
-        // Autenticar o usuário novamente com a senha antiga para garantir sua validade
         var credential = EmailAuthProvider.credential(
           email: _user!.email!,
           password: oldPassword,
@@ -73,12 +92,8 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
         if (updateData.isNotEmpty) {
           await FirebaseFirestore.instance
               .collection('users')
-              .doc(_user!.email)
-              .set(
-                  updateData,
-                  SetOptions(
-                      merge:
-                          true)); 
+              .doc(_user!.uid)
+              .set(updateData, SetOptions(merge: true));
         }
 
         final snackBar = SnackBar(
@@ -103,6 +118,58 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
     }
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    final returnedImage = await ImagePicker().pickImage(source: source);
+
+    if (returnedImage == null) return;
+    File selectedImage = File(returnedImage.path);
+
+    final storageRef = FirebaseStorage.instance.ref();
+    final imageref = storageRef.child("${FirebaseAuth.instance.currentUser!.email}.jpg");
+    await imageref.putFile(selectedImage);
+    var url = await imageref.getDownloadURL();
+    
+    setState(() {
+      _imageUrl = url;
+    });
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .set({"fotourl": url}, SetOptions(merge: true));
+  }
+
+  void _showImageSourceActionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.camera),
+                title: Text('Câmera'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Galeria'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,22 +192,38 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: MinhasCores.brancogelo,
-                  borderRadius: BorderRadius.circular(100),
+              GestureDetector(
+                onTap: () => _showImageSourceActionSheet(context),
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: _imageUrl != null
+                        ? Image.network(
+                            _imageUrl!,
+                            fit: BoxFit.cover,
+                            width: 150,
+                            height: 150,
+                          )
+                        : Container(
+                            color: MinhasCores.brancogelo,
+                            child: Icon(Icons.camera_alt_outlined, size: 70),
+                          ),
+                  ),
                 ),
               ),
-              SizedBox(height: 60),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _nomeController,
                 decoration: getAutenticationInputDecoration("Nome"),
               ),
               SizedBox(height: 20),
               TextFormField(
-                controller: _senhaAtualController, // Campo para a senha antiga
+                controller: _senhaAtualController,
                 decoration: getAutenticationInputDecoration("Senha Antiga"),
                 obscureText: true,
               ),

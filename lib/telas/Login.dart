@@ -1,10 +1,11 @@
+import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:flutter/material.dart';
 import 'package:app/_comum/meu_snackbar.dart';
 import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/componentes/decoracao_campo_autenticacao.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
 import 'package:app/telas/cliente/tela_inicial_cliente.dart';
-import 'package:app/telas/tela_inicial_tecnico.dart';
+import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum TipoUsuario { cliente, tecnico }
@@ -259,7 +260,7 @@ class _LoginState extends State<Login> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => tela_inicial_tecnico(),
+                        builder: (context) => Tela_inicial_tecnico(),
                       ),
                     );
                   }
@@ -308,7 +309,7 @@ class _LoginState extends State<Login> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => tela_inicial_tecnico(),
+                      builder: (context) => Tela_inicial_tecnico(),
                     ),
                   );
                 }
