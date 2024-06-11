@@ -1,4 +1,5 @@
 import 'package:app/telas/Tela_inicial.dart';
+import 'package:app/telas/tecnico/adicionar_horario.dart';
 import 'package:flutter/material.dart';
 import 'package:app/Pedidos.dart';
 import 'package:app/telas/cliente/geolocalizacao_cli.dart';
@@ -96,9 +97,7 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                           )
                         : null,
                   ),
-                  child: _imageUrl == null
-                      ? Icon(Icons.camera_alt_outlined, size: 70)
-                      : null,
+                  
                 ),
                 SizedBox(height: 70),
                 GestureDetector(
@@ -107,7 +106,7 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Pedidos(),
+                        builder: (context) => AdicionarHorarioScreen(),
                       ),
                     );
                   },
