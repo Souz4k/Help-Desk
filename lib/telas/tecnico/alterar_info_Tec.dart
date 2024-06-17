@@ -71,7 +71,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     try {
       if (_user != null) {
         var credential = EmailAuthProvider.credential(
-          email: _user!.email!,
+          email: _user!.uid,
           password: oldPassword,
         );
         await _user!.reauthenticateWithCredential(credential);
@@ -125,7 +125,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     File selectedImage = File(returnedImage.path);
 
     final storageRef = FirebaseStorage.instance.ref();
-    final imageref = storageRef.child("${FirebaseAuth.instance.currentUser!.email}.jpg");
+    final imageref = storageRef.child("${FirebaseAuth.instance.currentUser!.uid}.jpg");
     await imageref.putFile(selectedImage);
     var url = await imageref.getDownloadURL();
     

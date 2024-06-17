@@ -2,6 +2,9 @@ import 'package:app/_comum/meu_snackbar.dart';
 import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
 import 'package:app/telas/Tela_inicial.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -62,9 +65,27 @@ class _MapScreenState extends State<MapScreen> {
         );
       });
 
+  // Função para salvar a localização no Firestore
+  Future<void> _saveLocationToFirestore(LatLng position) async {
+    try {
+      // Obtém o UID do usuário logado
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('locations').add({
+          'uid': user.uid,
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      } else {
+        print('Usuário não autenticado.');
+      }
+    } catch (e) {
+      print('Erro ao salvar a localização: $e');
+    }
+  }
 
-
-      Future<void> _deslogar(BuildContext context) async {
+  Future<void> _deslogar(BuildContext context) async {
     try {
       await AutenticacaoServico().deslogar();
       // Navegue de volta para a tela de login

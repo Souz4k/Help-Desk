@@ -73,7 +73,7 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
     try {
       if (_user != null) {
         var credential = EmailAuthProvider.credential(
-          email: _user!.email!,
+          email: _user!.uid,
           password: oldPassword,
         );
         await _user!.reauthenticateWithCredential(credential);

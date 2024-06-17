@@ -1,7 +1,6 @@
 import 'package:app/telas/Tela_inicial.dart';
 import 'package:app/telas/tecnico/adicionar_horario.dart';
 import 'package:flutter/material.dart';
-import 'package:app/Pedidos.dart';
 import 'package:app/telas/cliente/geolocalizacao_cli.dart';
 import 'package:app/telas/suporte.dart';
 import 'package:app/telas/tecnico/alterar_info_Tec.dart';
