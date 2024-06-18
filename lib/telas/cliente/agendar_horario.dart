@@ -72,10 +72,14 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
             color: color,
             child: ListTile(
               leading: tecnico['fotoUrl'].isNotEmpty
-                  ? Image.network(tecnico['fotoUrl'], width: 50, height: 50, errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.person, size: 50); // Placeholder para erro ao carregar imagem
-                    })
-                  : Icon(Icons.person, size: 50),  // Placeholder para quando não há foto
+                  ? CircleAvatar(
+                      backgroundImage: NetworkImage(tecnico['fotoUrl']),
+                      radius: 25,
+                    )
+                  : CircleAvatar(
+                      child: Icon(Icons.person, size: 50),
+                      radius: 25,
+                    ),  // Placeholder para quando não há foto
               title: Text(tecnico['nome']),
               onTap: () => _onTecnicoSelected(tecnico),
             ),
@@ -332,6 +336,7 @@ class _AgendarHorarioScreenState extends State<AgendarHorarioScreen> {
       'problema': horario.problema,
       'disponivel': horario.disponivel,
       'telefone': telefone,
+      'status': 'em_analise', // adiciona o status inicial como 'em_analise'
     });
   }
 

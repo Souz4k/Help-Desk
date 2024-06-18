@@ -25,6 +25,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
   User? _user;
   String? _nomeAtual;
   String? _imageUrl;
+  List<String> _diplomaUrls = [];
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     _novaSenhaController = TextEditingController();
     _celularController = TextEditingController();
     _loadUserData();
+    _loadDiplomaImages();
   }
 
   Future<void> _loadUserData() async {
@@ -48,6 +50,22 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
       if (userDoc.exists && userDoc.data()!.containsKey('fotourl')) {
         setState(() {
           _imageUrl = userDoc['fotourl'];
+        });
+      }
+    }
+  }
+
+  Future<void> _loadDiplomaImages() async {
+    if (_user != null) {
+      var diplomasDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .collection('diplomas')
+          .get();
+
+      if (diplomasDoc.docs.isNotEmpty) {
+        setState(() {
+          _diplomaUrls = diplomasDoc.docs.map((doc) => doc['url'] as String).toList();
         });
       }
     }
@@ -71,7 +89,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     try {
       if (_user != null) {
         var credential = EmailAuthProvider.credential(
-          email: _user!.uid,
+          email: _user!.email!,
           password: oldPassword,
         );
         await _user!.reauthenticateWithCredential(credential);
@@ -118,7 +136,29 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     }
   }
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _pickDiplomaImage() async {
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+
+    if (returnedImage == null) return;
+    File selectedImage = File(returnedImage.path);
+
+    final storageRef = FirebaseStorage.instance.ref();
+    final imageref = storageRef.child("${_user!.uid}/diplomas/${DateTime.now().millisecondsSinceEpoch}.jpg");
+    await imageref.putFile(selectedImage);
+    var url = await imageref.getDownloadURL();
+
+    setState(() {
+      _diplomaUrls.add(url);
+    });
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(_user!.uid)
+        .collection("diplomas")
+        .add({"url": url});
+  }
+
+  Future<void> _pickProfileImage(ImageSource source) async {
     final returnedImage = await ImagePicker().pickImage(source: source);
 
     if (returnedImage == null) return;
@@ -128,7 +168,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     final imageref = storageRef.child("${FirebaseAuth.instance.currentUser!.uid}.jpg");
     await imageref.putFile(selectedImage);
     var url = await imageref.getDownloadURL();
-    
+
     setState(() {
       _imageUrl = url;
     });
@@ -139,7 +179,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
         .set({"fotourl": url}, SetOptions(merge: true));
   }
 
-  void _showImageSourceActionSheet(BuildContext context) {
+  void _showProfileImageSourceActionSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -152,7 +192,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                 title: Text('Câmera'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _pickImage(ImageSource.camera);
+                  _pickProfileImage(ImageSource.camera);
                 },
               ),
               ListTile(
@@ -160,7 +200,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                 title: Text('Galeria'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _pickImage(ImageSource.gallery);
+                  _pickProfileImage(ImageSource.gallery);
                 },
               ),
             ],
@@ -193,7 +233,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
           child: Column(
             children: [
               GestureDetector(
-                onTap: () => _showImageSourceActionSheet(context),
+                onTap: () => _showProfileImageSourceActionSheet(context),
                 child: Container(
                   width: 150,
                   height: 150,
@@ -246,6 +286,38 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               TextFormField(
                 controller: _celularController,
                 decoration: getAutenticationInputDecoration("Número de Celular"),
+              ),
+              SizedBox(height: 20),
+              Text("Diplomas:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
+              _diplomaUrls.isNotEmpty
+                  ? Container(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _diplomaUrls.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Image.network(
+                              _diplomaUrls[index],
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  : Text("Nenhum diploma adicionado."),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _pickDiplomaImage,
+                style: ElevatedButton.styleFrom(
+                  primary: MinhasCores.azulEscuro,
+                ),
+                child: Text("Adicionar Diploma",
+                    style: TextStyle(color: Colors.white)),
               ),
               SizedBox(height: 20),
               ElevatedButton(

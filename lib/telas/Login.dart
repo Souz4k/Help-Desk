@@ -253,25 +253,26 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> botaoDeLogar() async {
-    String nome = _nomeController.text;
-    String senha = _senhaController.text;
-    String confirmarSenha = _confirmarsenhaController.text;
-    String email = _emailController.text;
+  String nome = _nomeController.text;
+  String senha = _senhaController.text;
+  String confirmarSenha = _confirmarsenhaController.text;
+  String email = _emailController.text;
 
-    if (_formkey.currentState != null && _formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  if (_formkey.currentState != null && _formkey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
 
-      try {
-        if (queroEntrar) {
-          await _autenticacaoServico.logarUsuario(email: email, senha: senha);
-          User? user = FirebaseAuth.instance.currentUser;
-          if (user != null) {
-            String uid = user.uid;
+    try {
+      if (queroEntrar) {
+        await _autenticacaoServico.logarUsuario(email: email, senha: senha);
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          String uid = user.uid;
+          try {
             DocumentSnapshot doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
             if (doc.exists) {
-              String userType = doc['userType'];
+              String userType = doc.get('userType'); // Utilizando `doc.get` para obter o campo userType
               if (userType == 'cliente') {
                 _navigateToNextScreen(tela_inicial_cliente());
               } else if (userType == 'tecnico') {
@@ -282,43 +283,48 @@ class _LoginState extends State<Login> {
             } else {
               _showSnackBar("Usuário não encontrado");
             }
-          } else {
-            _showSnackBar("Erro ao recuperar usuário logado");
+          } catch (e) {
+            _showSnackBar("Erro ao recuperar documento do Firestore: ${e.toString()}");
           }
         } else {
-          await _autenticacaoServico.cadastrarUsuario(
-            nome: nome,
-            senha: senha,
-            confirmarSenha: confirmarSenha,
-            email: email,
-          );
-          User? user = FirebaseAuth.instance.currentUser;
-          if (user != null) {
-            String uid = user.uid;
-            await FirebaseFirestore.instance.collection('users').doc(uid).set({
-              'userType': _tipoUsuarioSelecionado == TipoUsuario.cliente ? 'cliente' : 'tecnico',
-              'nome': nome,  // Adicionando o campo nome ao documento
-            });
-            if (_tipoUsuarioSelecionado == TipoUsuario.cliente) {
-              _navigateToNextScreen(tela_inicial_cliente());
-            } else {
-              _navigateToNextScreen(Tela_inicial_tecnico());
-            }
-          } else {
-            _showSnackBar("Erro ao recuperar usuário logado");
-          }
+          _showSnackBar("Erro ao recuperar usuário logado");
         }
-      } catch (e) {
-        _showSnackBar(e.toString());
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
+      } else {
+        await _autenticacaoServico.cadastrarUsuario(
+          nome: nome,
+          senha: senha,
+          confirmarSenha: confirmarSenha,
+          email: email,
+        );
+        User? user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          String uid = user.uid;
+          await FirebaseFirestore.instance.collection('users').doc(uid).set({
+            'userType': _tipoUsuarioSelecionado == TipoUsuario.cliente ? 'cliente' : 'tecnico',
+            'nome': nome,
+          });
+          if (_tipoUsuarioSelecionado == TipoUsuario.cliente) {
+            _navigateToNextScreen(tela_inicial_cliente());
+          } else {
+            _navigateToNextScreen(Tela_inicial_tecnico());
+          }
+        } else {
+          _showSnackBar("Erro ao recuperar usuário logado");
+        }
       }
-    } else {
-      print("Formulário inválido");
+    } catch (e) {
+      _showSnackBar("Erro: ${e.toString()}");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
+  } else {
+    print("Formulário inválido");
   }
+}
+
+
 
   void _scrollToPosition(int position) {
     _scrollController.animateTo(
