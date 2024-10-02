@@ -272,7 +272,7 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: MinhasCores.azulEscuro,
+                    backgroundColor: MinhasCores.azulEscuro,
                   ),
                   child: Text("Atualizar Informações",
                       style: TextStyle(color: Colors.white)),

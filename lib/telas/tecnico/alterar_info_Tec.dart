@@ -314,7 +314,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               ElevatedButton(
                 onPressed: _pickDiplomaImage,
                 style: ElevatedButton.styleFrom(
-                  primary: MinhasCores.azulEscuro,
+                  backgroundColor: MinhasCores.azulEscuro,
                 ),
                 child: Text("Adicionar Diploma",
                     style: TextStyle(color: Colors.white)),
@@ -330,7 +330,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: MinhasCores.azulEscuro,
+                  backgroundColor: MinhasCores.azulEscuro,
                 ),
                 child: Text("Atualizar Informações",
                     style: TextStyle(color: Colors.white)),

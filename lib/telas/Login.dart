@@ -187,7 +187,7 @@ class _LoginState extends State<Login> {
                                 botaoDeLogar();
                               },
                               style: ElevatedButton.styleFrom(
-                                primary: MinhasCores.azulEscuro,
+                                backgroundColor: MinhasCores.azulEscuro,
                                 side: const BorderSide(color: Colors.black, width: 3.0),
                                 minimumSize: const Size(75, 25),
                                 padding: EdgeInsets.zero,
