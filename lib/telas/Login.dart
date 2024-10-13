@@ -72,182 +72,160 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
+      backgroundColor: const Color.fromARGB(255, 68, 138, 225), // Cor de fundo clara e limpa
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: SingleChildScrollView(
             controller: _scrollController,
-            physics: ClampingScrollPhysics(),
-            child: Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/fundo.jpg'),
-                  fit: BoxFit.cover,
+            child: Form(
+              key: _formkey,
+              autovalidateMode: AutovalidateMode.disabled,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Caixa branca elegante
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 5,
+                    ),
+                  ],
                 ),
-              ),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Form(
-                    key: _formkey,
-                    autovalidateMode: AutovalidateMode.disabled,
-                    child: Container(
-                      width: 225,
-                      height: getContainerHeight(),
-                      margin: const EdgeInsets.all(20),
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: MinhasCores.cinza,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (!queroEntrar) ...[
-                            DropdownButtonFormField<TipoUsuario>(
-                              value: _tipoUsuarioSelecionado,
-                              items: [
-                                DropdownMenuItem(
-                                  value: TipoUsuario.cliente,
-                                  child: Text('Cliente'),
-                                ),
-                                DropdownMenuItem(
-                                  value: TipoUsuario.tecnico,
-                                  child: Text('Técnico'),
-                                ),
-                              ],
-                              onChanged: (TipoUsuario? value) {
-                                setState(() {
-                                  _tipoUsuarioSelecionado = value!;
-                                });
-                              },
-                              decoration: getAutenticationInputDecoration("Tipo de Usuário"),
-                            ),
-                          ],
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          for (int i = 0; i < 2 + (queroEntrar ? 0 : 2); i++)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: TextFormField(
-                                controller: i == 0
-                                    ? _emailController
-                                    : i == 1
-                                        ? _senhaController
-                                        : i == 2
-                                            ? _confirmarsenhaController
-                                            : _nomeController,
-                                onTap: () {
-                                  _scrollToPosition(i + 1);
-                                },
-                                decoration: getAutenticationInputDecoration(
-                                  i == 0
-                                      ? "E-mail"
-                                      : i == 1
-                                          ? "Senha"
-                                          : i == 2
-                                              ? "Confirmar Senha"
-                                              : "Nome",
-                                ),
-                                obscureText: i == 1 || i == 2,
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return i == 0
-                                        ? "O e-mail não pode ser vazio"
-                                        : i == 1
-                                            ? "A senha não pode ser vazia"
-                                            : i == 2
-                                                ? "A confirmação de senha não pode ser vazia"
-                                                : "O nome não pode ser vazio";
-                                  }
-                                  if (value.length < 5) {
-                                    return i == 0
-                                        ? "O e-mail é muito curto"
-                                        : i == 1
-                                            ? "A senha é muito curta"
-                                            : i == 2
-                                                ? "A confirmação de senha é muito curta"
-                                                : "O nome é muito curto";
-                                  }
-                                  if (i == 0 && !value.contains("@")) {
-                                    return "O e-mail não é válido";
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          const SizedBox(height: 16),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _aumentarTamanhoContainer();
-                                botaoDeLogar();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: MinhasCores.azulEscuro,
-                                side: const BorderSide(color: Colors.black, width: 3.0),
-                                minimumSize: const Size(75, 25),
-                                padding: EdgeInsets.zero,
-                              ),
-                              child: Container(
-                                width: 75,
-                                height: 25,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Image.asset(
-                                      "assets/setaDireita.png",
-                                      width: 40,
-                                      height: 40,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _formkey.currentState?.reset();
-                                queroEntrar = !queroEntrar;
-                                _erroNoTextField = false; // Redefine _erroNoTextField ao alternar entre Login e Cadastrar-se
-                              });
-                            },
-                            child: Text(
-                              queroEntrar ? "Cadastrar-se" : "Login",
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          const Divider(
-                            color: Colors.white,
-                            thickness: 1.5,
-                            height: 0,
-                            indent: 50,
-                            endIndent: 50,
-                          ),
-                        ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      queroEntrar ? 'Login' : 'Cadastrar-se',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    if (!queroEntrar) ...[
+                      DropdownButtonFormField<TipoUsuario>(
+                        value: _tipoUsuarioSelecionado,
+                        items: [
+                          DropdownMenuItem(
+                            value: TipoUsuario.cliente,
+                            child: Text('Cliente'),
+                          ),
+                          DropdownMenuItem(
+                            value: TipoUsuario.tecnico,
+                            child: Text('Técnico'),
+                          ),
+                        ],
+                        onChanged: (TipoUsuario? value) {
+                          setState(() {
+                            _tipoUsuarioSelecionado = value!;
+                          });
+                        },
+                        decoration: getAutenticationInputDecoration("Tipo de Usuário"),
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                    for (int i = 0; i < 2 + (queroEntrar ? 0 : 2); i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: TextFormField(
+                          controller: i == 0
+                              ? _emailController
+                              : i == 1
+                                  ? _senhaController
+                                  : i == 2
+                                      ? _confirmarsenhaController
+                                      : _nomeController,
+                          onTap: () {
+                            _scrollToPosition(i + 1);
+                          },
+                          decoration: getAutenticationInputDecoration(
+                            i == 0
+                                ? "E-mail"
+                                : i == 1
+                                    ? "Senha"
+                                    : i == 2
+                                        ? "Confirmar Senha"
+                                        : "Nome",
+                          ),
+                          obscureText: i == 1 || i == 2,
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return i == 0
+                                  ? "O e-mail não pode ser vazio"
+                                  : i == 1
+                                      ? "A senha não pode ser vazia"
+                                      : i == 2
+                                          ? "A confirmação de senha não pode ser vazia"
+                                          : "O nome não pode ser vazio";
+                            }
+                            if (value.length < 5) {
+                              return i == 0
+                                  ? "O e-mail é muito curto"
+                                  : i == 1
+                                      ? "A senha é muito curta"
+                                      : i == 2
+                                          ? "A confirmação de senha é muito curta"
+                                          : "O nome é muito curto";
+                            }
+                            if (i == 0 && !value.contains("@")) {
+                              return "O e-mail não é válido";
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    const SizedBox(height: 24),
+                    if (_isLoading)
+                      CircularProgressIndicator()
+                    else
+                      ElevatedButton(
+                        onPressed: () {
+                          _aumentarTamanhoContainer();
+                          botaoDeLogar();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Colors.blueAccent,
+                        ),
+                        child: Text(
+                          queroEntrar ? 'Entrar' : 'Cadastrar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _formkey.currentState?.reset();
+                          queroEntrar = !queroEntrar;
+                          _erroNoTextField = false;
+                        });
+                      },
+                      child: Text(
+                        queroEntrar ? "Cadastrar-se" : "Login",
+                        style: TextStyle(color: Colors.blueAccent),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black54,
-              child: Center(
-                child: Text(
-                  "Aguarde um momento...",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -323,7 +301,6 @@ class _LoginState extends State<Login> {
     print("Formulário inválido");
   }
 }
-
 
 
   void _scrollToPosition(int position) {
