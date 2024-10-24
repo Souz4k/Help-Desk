@@ -13,14 +13,12 @@ import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/_comum/meu_snackbar.dart';
 import 'package:app/telas/Tela_inicial.dart';
 
-class tela_inicial_cliente extends StatefulWidget {
-  tela_inicial_cliente({Key? key});
-
+class telaInicialCliente extends StatefulWidget {
   @override
-  State<tela_inicial_cliente> createState() => _tela_inicial_clienteState();
+  telaInicialClienteState createState() => telaInicialClienteState();
 }
 
-class _tela_inicial_clienteState extends State<tela_inicial_cliente> {
+class telaInicialClienteState extends State<telaInicialCliente> {
   late User _user;
   String? _imageUrl;
 
@@ -44,16 +42,52 @@ class _tela_inicial_clienteState extends State<tela_inicial_cliente> {
   Future<void> _deslogar(BuildContext context) async {
     try {
       await AutenticacaoServico().deslogar();
-      // Navegue de volta para a tela de login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => TelaInicial()),
       );
     } catch (e) {
-      // Trate o erro, se necessário
       print("Erro ao deslogar: $e");
       mostrarSnackBar(context: context, texto: "Erro ao deslogar");
     }
+  }
+
+  Widget _buildMenuButton(String title, IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        padding: EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: MinhasCores.azulEscuro, size: 28),
+            SizedBox(width: 15),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.black26, size: 20),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -61,191 +95,72 @@ class _tela_inicial_clienteState extends State<tela_inicial_cliente> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: MinhasCores.azulEscuro,
-        automaticallyImplyLeading: false, // Define para não mostrar a seta
+        elevation: 0,
+        title: Text("Help Desk", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
-      endDrawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Deslogar"),
-              onTap: () => _deslogar(context),
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text("informações"),
-              onTap: () {
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                // Removido: _pickImageFromCamera(); // Adicione aqui a lógica para selecionar uma imagem da câmera
+                },
+                child: CircleAvatar(
+                  radius: 70,
+                  backgroundImage: _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                  backgroundColor: MinhasCores.brancogelo,
+                  child: _imageUrl == null
+                      ? Icon(Icons.person, size: 70, color: Colors.grey)
+                      : null,
+                ),
+              ),
+              SizedBox(height: 20),
+              _buildMenuButton("Ajuda Técnica", Icons.build, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SelecionarTecnicoScreen()),
+                );
+              }),
+              _buildMenuButton("Histórico de Técnicos", Icons.history, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoricoCliente()),
+                );
+              }),
+              _buildMenuButton("Atendimentos Agendados", Icons.event, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AtendimentosAgendados()),
+                );
+              }),
+              _buildMenuButton("Suporte", Icons.help_outline, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Suporte()),
+                );
+              }),
+              _buildMenuButton("Técnicos em sua Região", Icons.location_on, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Geolocalizacao()),
+                );
+              }),
+              _buildMenuButton("Informações de seu Perfil", Icons.person, () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AlterarInfoCli()),
                 );
-              },
-            )
-          ],
+              }),
+              _buildMenuButton("Deslogar", Icons.logout, () => _deslogar(context)),
+            ],
+          ),
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.only(top: 50),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: () {
-                // Removido: _pickImageFromCamera(); // Adicione aqui a lógica para selecionar uma imagem da câmera
-              },
-              child: Align(
-                alignment: Alignment.topCenter,
-                child:  Container(
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: MinhasCores.brancogelo,
-                      shape: BoxShape.circle,
-                      image: _imageUrl != null
-                          ? DecorationImage(
-                              image: NetworkImage(_imageUrl!),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                  ),
-              ),
-            ),
-            SizedBox(height: 20),
-            GestureDetector(
-              behavior: HitTestBehavior.translucent, // Adicione esta linha
-              onTap: () {
-                // Adicione a lógica que deseja quando o círculo é clicado
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SelecionarTecnicoScreen(),
-                  ),
-                );
-              },
-              child: Container(
-                width: double.infinity, // Preenche toda a largura
-                height: 75, // Ajuste a altura conforme necessário
-                color: MinhasCores.brancogelo,
-                child: Center(
-                  child: Text(
-                    "Ajuda técnica",
-                    style: TextStyle(
-                      color: Colors.black, // Cor do texto
-                      fontSize: 20, // Tamanho da fonte
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              behavior: HitTestBehavior.translucent, // Adicione esta linha
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HistoricoCliente(),
-                  ),
-                );
-              },
-              child: Container(
-                width: double.infinity, // Preenche toda a largura
-                height: 75, // Ajuste a altura conforme necessário
-                margin: EdgeInsets.only(top: 0),
-                color: Colors.white,
-                child: Center(
-                  child: Text(
-                    "Histórico de Técnicos",
-                    style: TextStyle(
-                      color: Colors.black, // Cor do texto
-                      fontSize: 20, // Tamanho da fonte
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              behavior: HitTestBehavior.translucent, // Adicione esta linha
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AtendimentosAgendados(),
-                  ),
-                );
-              },
-              child: Container(
-                width: double.infinity, // Preenche toda a largura
-                height: 75, // Ajuste a altura conforme necessário
-                margin: EdgeInsets.only(top: 0),
-                color: MinhasCores.brancogelo,
-                child: Center(
-                  child: Text(
-                    "Atendimentos agendados",
-                    style: TextStyle(
-                      color: Colors.black, // Cor do texto
-                      fontSize: 20, // Tamanho da fonte
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              behavior: HitTestBehavior.translucent, // Adicione esta linha
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Suporte(),
-                  ),
-                );
-              },
-              child: Container(
-                width: double.infinity, // Preenche toda a largura
-                height: 75, // Ajuste a altura conforme necessário
-                margin: EdgeInsets.only(top: 0),
-                color: Colors.white,
-                child: Center(
-                  child: Text(
-                    "Suporte",
-                    style: TextStyle(
-                      color: Colors.black, // Cor do texto
-                      fontSize: 20, // Tamanho da fonte
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              behavior: HitTestBehavior.translucent, // Adicione esta linha
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Geolocalizacao(),
-                  ),
-                );
-              },
-              child: Container(
-                width: double.infinity, // Preenche toda a largura
-                height: 75, // Ajuste a altura conforme necessário
-                margin: EdgeInsets.only(top: 0),
-                color: MinhasCores.brancogelo,
-                child: Center(
-                  child: Text(
-                    "Técnicos em sua região",
-                    style: TextStyle(
-                      color: Colors.black, // Cor do texto
-                      fontSize: 20, // Tamanho da fonte
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ), 
     );
   }
-
-
 }

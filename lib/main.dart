@@ -65,7 +65,7 @@ class RoteadorTela extends StatelessWidget {
               }
               if (userTypeSnapshot.hasData) {
                 if (userTypeSnapshot.data == 'cliente') {
-                  return tela_inicial_cliente();
+                  return telaInicialCliente();
                 } else if (userTypeSnapshot.data == 'tecnico') {
                   return Tela_inicial_tecnico();
                 }

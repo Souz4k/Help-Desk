@@ -3,7 +3,7 @@ import 'package:app/_comum/meu_snackbar.dart';
 import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/componentes/decoracao_campo_autenticacao.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
-import 'package:app/telas/cliente/tela_inicial_cliente.dart';
+import "package:app/telas/cliente/tela_inicial_cliente.dart";
 import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -72,7 +72,8 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 68, 138, 225), // Cor de fundo clara e limpa
+      backgroundColor:
+          const Color.fromARGB(255, 68, 138, 225), // Cor de fundo clara e limpa
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -124,7 +125,8 @@ class _LoginState extends State<Login> {
                             _tipoUsuarioSelecionado = value!;
                           });
                         },
-                        decoration: getAutenticationInputDecoration("Tipo de Usuário"),
+                        decoration:
+                            getAutenticationInputDecoration("Tipo de Usuário"),
                       ),
                     ],
                     const SizedBox(height: 10),
@@ -231,77 +233,83 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> botaoDeLogar() async {
-  String nome = _nomeController.text;
-  String senha = _senhaController.text;
-  String confirmarSenha = _confirmarsenhaController.text;
-  String email = _emailController.text;
+    String nome = _nomeController.text;
+    String senha = _senhaController.text;
+    String confirmarSenha = _confirmarsenhaController.text;
+    String email = _emailController.text;
 
-  if (_formkey.currentState != null && _formkey.currentState!.validate()) {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      if (queroEntrar) {
-        await _autenticacaoServico.logarUsuario(email: email, senha: senha);
-        User? user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          String uid = user.uid;
-          try {
-            DocumentSnapshot doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-            if (doc.exists) {
-              String userType = doc.get('userType'); // Utilizando `doc.get` para obter o campo userType
-              if (userType == 'cliente') {
-                _navigateToNextScreen(tela_inicial_cliente());
-              } else if (userType == 'tecnico') {
-                _navigateToNextScreen(Tela_inicial_tecnico());
-              } else {
-                _showSnackBar("Tipo de usuário inválido");
-              }
-            } else {
-              _showSnackBar("Usuário não encontrado");
-            }
-          } catch (e) {
-            _showSnackBar("Erro ao recuperar documento do Firestore: ${e.toString()}");
-          }
-        } else {
-          _showSnackBar("Erro ao recuperar usuário logado");
-        }
-      } else {
-        await _autenticacaoServico.cadastrarUsuario(
-          nome: nome,
-          senha: senha,
-          confirmarSenha: confirmarSenha,
-          email: email,
-        );
-        User? user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          String uid = user.uid;
-          await FirebaseFirestore.instance.collection('users').doc(uid).set({
-            'userType': _tipoUsuarioSelecionado == TipoUsuario.cliente ? 'cliente' : 'tecnico',
-            'nome': nome,
-          });
-          if (_tipoUsuarioSelecionado == TipoUsuario.cliente) {
-            _navigateToNextScreen(tela_inicial_cliente());
-          } else {
-            _navigateToNextScreen(Tela_inicial_tecnico());
-          }
-        } else {
-          _showSnackBar("Erro ao recuperar usuário logado");
-        }
-      }
-    } catch (e) {
-      _showSnackBar("Erro: ${e.toString()}");
-    } finally {
+    if (_formkey.currentState != null && _formkey.currentState!.validate()) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
-    }
-  } else {
-    print("Formulário inválido");
-  }
-}
 
+      try {
+        if (queroEntrar) {
+          await _autenticacaoServico.logarUsuario(email: email, senha: senha);
+          User? user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            String uid = user.uid;
+            try {
+              DocumentSnapshot doc = await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .get();
+              if (doc.exists) {
+                String userType = doc.get(
+                    'userType'); // Utilizando `doc.get` para obter o campo userType
+                if (userType == 'cliente') {
+                  _navigateToNextScreen(telaInicialCliente());
+                } else if (userType == 'tecnico') {
+                  _navigateToNextScreen(Tela_inicial_tecnico());
+                } else {
+                  _showSnackBar("Tipo de usuário inválido");
+                }
+              } else {
+                _showSnackBar("Usuário não encontrado");
+              }
+            } catch (e) {
+              _showSnackBar(
+                  "Erro ao recuperar documento do Firestore: ${e.toString()}");
+            }
+          } else {
+            _showSnackBar("Erro ao recuperar usuário logado");
+          }
+        } else {
+          await _autenticacaoServico.cadastrarUsuario(
+            nome: nome,
+            senha: senha,
+            confirmarSenha: confirmarSenha,
+            email: email,
+          );
+          User? user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            String uid = user.uid;
+            await FirebaseFirestore.instance.collection('users').doc(uid).set({
+              'userType': _tipoUsuarioSelecionado == TipoUsuario.cliente
+                  ? 'cliente'
+                  : 'tecnico',
+              'nome': nome,
+            });
+            if (_tipoUsuarioSelecionado == TipoUsuario.cliente) {
+              _navigateToNextScreen(telaInicialCliente());
+            } else {
+              _navigateToNextScreen(Tela_inicial_tecnico());
+            }
+          } else {
+            _showSnackBar("Erro ao recuperar usuário logado");
+          }
+        }
+      } catch (e) {
+        _showSnackBar("Erro: ${e.toString()}");
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      print("Formulário inválido");
+    }
+  }
 
   void _scrollToPosition(int position) {
     _scrollController.animateTo(

@@ -29,8 +29,10 @@ class TelaInicial extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // Centraliza verticalmente
-                crossAxisAlignment: CrossAxisAlignment.center, // Centraliza horizontalmente
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Centraliza verticalmente
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // Centraliza horizontalmente
                 children: [
                   // Texto de boas-vindas centralizado
                   Text.rich(
@@ -81,9 +83,11 @@ class TelaInicial extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightBlueAccent,
+                        backgroundColor:
+                            Colors.lightBlueAccent, // A cor do botão
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15), // Bordas arredondadas maiores
+                          borderRadius:
+                              BorderRadius.circular(15), // Bordas arredondadas
                         ),
                       ),
                       child: Text(
