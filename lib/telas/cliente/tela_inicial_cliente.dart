@@ -71,7 +71,7 @@ class telaInicialClienteState extends State<telaInicialCliente> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: MinhasCores.azulEscuro, size: 28),
+            Icon(icon, color: Colors.blueAccent, size: 28),
             SizedBox(width: 15),
             Expanded(
               child: Text(
@@ -94,7 +94,7 @@ class telaInicialClienteState extends State<telaInicialCliente> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: MinhasCores.azulEscuro,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
         title: Text("Help Desk", style: TextStyle(color: Colors.white)),
         centerTitle: true,
