@@ -1,11 +1,6 @@
-import 'package:app/componentes/decoracao_campo_autenticacao.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app/servicos/autenticacao_servico.dart';
-import 'package:app/telas/Tela_inicial.dart';
-import 'package:app/_comum/meu_snackbar.dart';
-import 'package:app/_comum/minhas_cores.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -25,8 +20,6 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
   User? _user;
   String? _nomeAtual;
   String? _imageUrl;
-
-  late final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -55,25 +48,12 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
     }
   }
 
-  Future<void> _deslogar(BuildContext context) async {
-    try {
-      await AutenticacaoServico().deslogar();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => TelaInicial()),
-      );
-    } catch (e) {
-      print("Erro ao deslogar: $e");
-      mostrarSnackBar(context: context, texto: "Erro ao deslogar");
-    }
-  }
-
-  Future<void> _atualizarInformacoes(
-      String newName, String oldPassword, String newSenha, String celular) async {
+  Future<void> _atualizarInformacoes(String newName, String oldPassword,
+      String newSenha, String celular) async {
     try {
       if (_user != null) {
         var credential = EmailAuthProvider.credential(
-          email: _user!.uid,
+          email: _user!.email!,
           password: oldPassword,
         );
         await _user!.reauthenticateWithCredential(credential);
@@ -98,25 +78,20 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
               .set(updateData, SetOptions(merge: true));
         }
 
-        final snackBar = SnackBar(
-          content: Text(
-            "Informações atualizadas com sucesso",
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.green,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // Mostrar pop-up de sucesso
+        _showSuccessDialog();
       }
     } catch (e) {
       print("Erro ao atualizar informações: $e");
-      final snackBar = SnackBar(
-        content: Text(
-          "Erro ao atualizar informações",
-          style: TextStyle(color: Colors.white),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Erro ao atualizar informações",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
         ),
-        backgroundColor: Colors.red,
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
@@ -151,137 +126,194 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
     }
   }
 
-  void _showImageSourceActionSheet(BuildContext context) {
+  Future<void> _showSuccessDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible:
+          false, // O usuário precisa pressionar OK para fechar o diálogo
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 30),
+              SizedBox(width: 10),
+              Text(
+                'Sucesso',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Informações atualizadas com sucesso!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+        title: Text("Alterar Informações"),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () => _showImageSourceActionSheet(context),
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: _imageUrl != null
+                        ? Image.network(
+                            _imageUrl!,
+                            fit: BoxFit.cover,
+                            width: 150,
+                            height: 150,
+                          )
+                        : Icon(Icons.camera_alt_outlined, size: 70),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _nomeController,
+                decoration: InputDecoration(
+                  labelText: 'Nome',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _senhaAtualController,
+                decoration: InputDecoration(
+                  labelText: 'Senha Atual',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _novaSenhaController,
+                decoration: InputDecoration(
+                  labelText: 'Nova Senha',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _celularController,
+                decoration: InputDecoration(
+                  labelText: 'Celular',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () async {
+                  await _atualizarInformacoes(
+                    _nomeController.text,
+                    _senhaAtualController.text,
+                    _novaSenhaController.text,
+                    _celularController.text,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                child: Text(
+                  "Atualizar Informações",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showImageSourceActionSheet(BuildContext context) async {
     showModalBottomSheet(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: Wrap(
             children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.camera),
-                title: Text('Câmera'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _pickImage(ImageSource.camera);
-                },
-              ),
               ListTile(
                 leading: Icon(Icons.photo_library),
                 title: Text('Galeria'),
                 onTap: () {
-                  Navigator.of(context).pop();
                   _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('Câmera'),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
                 },
               ),
             ],
           ),
         );
       },
-    );
-  }
-
-   @override
-  Widget build(BuildContext context) {
-    return ScaffoldMessenger(
-      key: _scaffoldMessengerKey,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: MinhasCores.azulEscuro,
-        ),
-        endDrawer: Drawer(
-          child: ListView(
-            children: [
-              ListTile(
-                leading: Icon(Icons.logout),
-                title: Text("Deslogar"),
-                onTap: () => _deslogar(context),
-              ),
-            ],
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () => _showImageSourceActionSheet(context),
-                  child: Container(
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: ClipOval(
-                      child: _imageUrl != null
-                          ? Image.network(
-                              _imageUrl!,
-                              fit: BoxFit.cover,
-                              width: 150,
-                              height: 150,
-                            )
-                          : Container(
-                              color: MinhasCores.brancogelo,
-                              child: Icon(Icons.camera_alt_outlined, size: 70),
-                            ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _nomeController,
-                  decoration: getAutenticationInputDecoration("Nome"),
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _senhaAtualController,
-                  decoration: getAutenticationInputDecoration("Senha Antiga"),
-                  obscureText: true,
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _novaSenhaController,
-                  decoration: getAutenticationInputDecoration("Nova Senha"),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "A senha não pode ser vazia";
-                    }
-                    if (value.length < 6) {
-                      return "A senha é muito curta";
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _celularController,
-                  decoration: getAutenticationInputDecoration("Número de Celular"),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    await _atualizarInformacoes(
-                      _nomeController.text,
-                      _senhaAtualController.text,
-                      _novaSenhaController.text,
-                      _celularController.text,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: MinhasCores.azulEscuro,
-                  ),
-                  child: Text("Atualizar Informações",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
