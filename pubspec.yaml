@@ -23,6 +23,8 @@ dependencies:
   geolocator: ^11.0.0
   flutter_launcher_icons: ^0.13.1
   google_fonts: ^4.0.3
+  mask_text_input_formatter: ^2.0.0
+
 
   shared_preferences: ^2.0.6
 
