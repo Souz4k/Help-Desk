@@ -47,69 +47,72 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
   }
 
   void _showTecnicoDetails(Map<String, dynamic> tecnico) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded( // Use Expanded para que o texto não fique cortado
-              child: Text(
-                "Detalhes do Técnico",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                overflow: TextOverflow.visible, // Garante que o texto não fique cortado
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop(); // Fecha o diálogo
-              },
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            tecnico['fotoUrl'].isNotEmpty
-                ? CircleAvatar(
-                    backgroundImage: NetworkImage(tecnico['fotoUrl']),
-                    radius: 50,
-                  )
-                : CircleAvatar(
-                    child: Icon(Icons.person, size: 50),
-                    radius: 50,
-                  ),
-            SizedBox(height: 10),
-            Text(tecnico['nome'],
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 5),
-            Text(tecnico['telefone'],
-                style: TextStyle(color: Colors.grey[600])),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _onTecnicoSelected(tecnico);
-              },
-              child: Text("Ver horários disponíveis",
-                  style: TextStyle(fontSize: 15, color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                // Use Expanded para que o texto não fique cortado
+                child: Text(
+                  "Detalhes do Técnico",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  overflow: TextOverflow
+                      .visible, // Garante que o texto não fique cortado
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Fecha o diálogo
+                },
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              tecnico['fotoUrl'].isNotEmpty
+                  ? CircleAvatar(
+                      backgroundImage: NetworkImage(tecnico['fotoUrl']),
+                      radius: 50,
+                    )
+                  : CircleAvatar(
+                      child: Icon(Icons.person, size: 50),
+                      radius: 50,
+                    ),
+              SizedBox(height: 10),
+              Text(tecnico['nome'],
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              SizedBox(height: 5),
+              Text(tecnico['telefone'],
+                  style: TextStyle(color: Colors.grey[600])),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _onTecnicoSelected(tecnico);
+                },
+                child: Text("Ver horários disponíveis",
+                    style: TextStyle(fontSize: 15, color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   void _onTecnicoSelected(Map<String, dynamic> tecnico) {
     Navigator.push(
@@ -230,17 +233,19 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white, // Define a cor de fundo do card
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.min, // Adicionando esta linha
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded( // Usando Expanded para permitir que o texto utilize o espaço
+            Expanded(
               child: Text(
                 "Confirmar Agendamento",
                 style: TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis, // Para evitar overflow
-                maxLines: 2, // Limitar a uma linha
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
               ),
             ),
             IconButton(
@@ -270,7 +275,7 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
         actions: [
           TextButton(
             child: Text("Cancelar",
-                style: TextStyle(color: Colors.white, fontSize: 14)),
+                style: TextStyle(color: Colors.blueAccent, fontSize: 14)), // Alterado para azul
             onPressed: () => Navigator.pop(context),
           ),
           ElevatedButton(
