@@ -322,12 +322,12 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: TextStyle(color: Colors.grey[700]),
+        labelStyle: TextStyle(color: Colors.black),
         border: OutlineInputBorder(),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.blueAccent)),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Colors.white,
       ),
       obscureText: obscureText,
     );
@@ -338,12 +338,12 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
       controller: _celularController,
       decoration: InputDecoration(
         labelText: 'Celular',
-        labelStyle: TextStyle(color: Colors.grey[700]),
+        labelStyle: TextStyle(color: Colors.black),
         border: OutlineInputBorder(),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.blueAccent)),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Colors.white,
       ),
       keyboardType: TextInputType.phone,
       inputFormatters: [
