@@ -36,7 +36,7 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
       return {
         'uid': doc.id,
         'nome': data['nome'] ?? 'Nome não disponível',
-        'telefone': data['telefone'] ?? 'Telefone não disponível',
+        'celular': data['celular'] ?? 'celular não disponível',
         'fotoUrl': data['fotoUrl'] ?? ''
       };
     }).toList();
@@ -89,7 +89,7 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
               Text(tecnico['nome'],
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               SizedBox(height: 5),
-              Text(tecnico['telefone'],
+              Text(tecnico['celular'],
                   style: TextStyle(color: Colors.grey[600])),
               SizedBox(height: 20),
               ElevatedButton(
