@@ -220,81 +220,93 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
   }
 
   void _showConfirmationDialog(Horario horario) {
-  final _nomeController = TextEditingController(text: horario.nome);
-  final _configuracaoController = TextEditingController(text: horario.configuracao);
-  final _problemaController = TextEditingController(text: horario.problema);
+    final _nomeController = TextEditingController(text: horario.nome);
+    final _configuracaoController =
+        TextEditingController(text: horario.configuracao);
+    final _problemaController = TextEditingController(text: horario.problema);
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: Text(
-                "Confirmar Agendamento",
-                style: TextStyle(fontWeight: FontWeight.bold),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.white,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                "Horário: ${horario.hora}",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  "Confirmar Agendamento",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
               ),
-              SizedBox(height: 20),
-              _buildTextField(_nomeController, "Nome", false),
-              SizedBox(height: 20),
-              _buildTextField(_configuracaoController, "Configuração do Aparelho", false),
-              SizedBox(height: 20),
-              _buildTextField(_problemaController, "Problema", false),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            child: Text("Cancelar", style: TextStyle(color: Colors.blueAccent, fontSize: 14)),
-            onPressed: () => Navigator.pop(context),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Horário: ${horario.hora}",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+                _buildTextField(_nomeController, "Nome", false),
+                SizedBox(height: 20),
+                _buildTextField(
+                    _configuracaoController, "Configuração do Aparelho", false),
+                SizedBox(height: 20),
+                _buildTextField(_problemaController, "Problema", false),
+              ],
+            ),
           ),
-          ElevatedButton(
-            child: Text("Confirmar", style: TextStyle(color: Colors.white, fontSize: 14)),
-            onPressed: () async {
-              String agendamentoId = DateTime.now().millisecondsSinceEpoch.toString();
+          actions: [
+            TextButton(
+              child: Text("Cancelar",
+                  style: TextStyle(color: Colors.blueAccent, fontSize: 14)),
+              onPressed: () => Navigator.pop(context),
+            ),
+            ElevatedButton(
+              child: Text("Confirmar",
+                  style: TextStyle(color: Colors.white, fontSize: 14)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent, // Cor de fundo do botão
+              ),
+              onPressed: () async {
+                String agendamentoId =
+                    DateTime.now().millisecondsSinceEpoch.toString();
 
-              await FirebaseFirestore.instance.collection('horarios').doc(horario.id).set({
-                'nome': _nomeController.text,
-                'configuracao': _configuracaoController.text,
-                'problema': _problemaController.text,
-                'disponivel': false,
-                'agendamentoId': agendamentoId,
-                'uidUsuario': FirebaseAuth.instance.currentUser?.uid ?? "",
-                'uidTecnico': widget.tecnico['uid'],  // Incluindo o ID do técnico
-              });
+                await FirebaseFirestore.instance
+                    .collection('horarios')
+                    .doc(horario.id)
+                    .set({
+                  'nome': _nomeController.text,
+                  'configuracao': _configuracaoController.text,
+                  'problema': _problemaController.text,
+                  'disponivel': false,
+                  'agendamentoId': agendamentoId,
+                  'uidUsuario': FirebaseAuth.instance.currentUser?.uid ?? "",
+                  'uidTecnico':
+                      widget.tecnico['uid'], // Incluindo o ID do técnico
+                });
 
-              Navigator.pop(context);
-              _showSuccessDialog();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
+                Navigator.pop(context);
+                _showSuccessDialog();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showSuccessDialog() {
     showDialog(
@@ -303,27 +315,51 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
         return AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 30),
-              SizedBox(width: 8),
-              Text("Agendado com Sucesso!",
-                  style: TextStyle(color: Colors.green, fontSize: 16)),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green),
+                  SizedBox(width: 8), // Espaço entre o ícone e o texto
+                  Expanded(
+                    child: Text(
+                      "Agendamento Realizado",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      maxLines: 2, // Permitir até 2 linhas
+                      overflow: TextOverflow
+                          .ellipsis, // Exibir reticências para textos longos
+                    ),
+                  ),
+                ],
+              ),
             ],
+          ),
+          content: Text(
+            "Seu agendamento foi realizado com sucesso!",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize:
+                  16, // Tamanho da fonte ajustado para melhorar a legibilidade
+            ),
           ),
           actions: [
             Center(
-              child: ElevatedButton(
+              child: TextButton(
+                child: Text("Ok"),
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.pop(context);
                 },
-                child: Text("Ok", style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.green, // Cor de fundo do botão
+                  foregroundColor: Colors.white, // Cor do texto
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                    borderRadius:
+                        BorderRadius.circular(20), // Bordas arredondadas
+                  ),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12), // Padding
                 ),
               ),
             ),
