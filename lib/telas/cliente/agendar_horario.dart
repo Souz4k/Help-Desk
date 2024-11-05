@@ -57,19 +57,15 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                // Use Expanded para que o texto não fique cortado
                 child: Text(
                   "Detalhes do Técnico",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  overflow: TextOverflow
-                      .visible, // Garante que o texto não fique cortado
+                  overflow: TextOverflow.visible,
                 ),
               ),
               IconButton(
                 icon: Icon(Icons.close),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Fecha o diálogo
-                },
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           ),
@@ -225,17 +221,15 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
 
   void _showConfirmationDialog(Horario horario) {
   final _nomeController = TextEditingController(text: horario.nome);
-  final _configuracaoController =
-      TextEditingController(text: horario.configuracao);
+  final _configuracaoController = TextEditingController(text: horario.configuracao);
   final _problemaController = TextEditingController(text: horario.problema);
 
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white, // Define a cor de fundo do card
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.min,
@@ -265,8 +259,7 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
               SizedBox(height: 20),
               _buildTextField(_nomeController, "Nome", false),
               SizedBox(height: 20),
-              _buildTextField(
-                  _configuracaoController, "Configuração do Aparelho", false),
+              _buildTextField(_configuracaoController, "Configuração do Aparelho", false),
               SizedBox(height: 20),
               _buildTextField(_problemaController, "Problema", false),
             ],
@@ -274,45 +267,34 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
         ),
         actions: [
           TextButton(
-            child: Text("Cancelar",
-                style: TextStyle(color: Colors.blueAccent, fontSize: 14)), // Alterado para azul
+            child: Text("Cancelar", style: TextStyle(color: Colors.blueAccent, fontSize: 14)),
             onPressed: () => Navigator.pop(context),
           ),
           ElevatedButton(
-            child: Text("Confirmar",
-                style: TextStyle(color: Colors.white, fontSize: 14)),
+            child: Text("Confirmar", style: TextStyle(color: Colors.white, fontSize: 14)),
             onPressed: () async {
-              await FirebaseFirestore.instance
-                  .collection('horarios')
-                  .doc(horario.id)
-                  .update({
-                'disponivel': false,
+              String agendamentoId = DateTime.now().millisecondsSinceEpoch.toString();
+
+              await FirebaseFirestore.instance.collection('horarios').doc(horario.id).set({
                 'nome': _nomeController.text,
                 'configuracao': _configuracaoController.text,
                 'problema': _problemaController.text,
+                'disponivel': false,
+                'agendamentoId': agendamentoId,
+                'uidUsuario': FirebaseAuth.instance.currentUser?.uid ?? "",
+                'uidTecnico': widget.tecnico['uid'],  // Incluindo o ID do técnico
               });
-              setState(() {
-                horario.disponivel = false;
-                horario.nome = _nomeController.text;
-                horario.configuracao = _configuracaoController.text;
-                horario.problema = _problemaController.text;
-              });
+
               Navigator.pop(context);
               _showSuccessDialog();
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
           ),
         ],
       );
     },
   );
 }
+
 
   void _showSuccessDialog() {
     showDialog(
@@ -321,51 +303,27 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
         return AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.check_circle, color: Colors.green),
-                  SizedBox(width: 8), // Espaço entre o ícone e o texto
-                  Expanded(
-                    child: Text(
-                      "Agendamento Realizado",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                      maxLines: 2, // Permitir até 2 linhas
-                      overflow: TextOverflow
-                          .ellipsis, // Exibir reticências para textos longos
-                    ),
-                  ),
-                ],
-              ),
+              Icon(Icons.check_circle, color: Colors.green, size: 30),
+              SizedBox(width: 8),
+              Text("Agendado com Sucesso!",
+                  style: TextStyle(color: Colors.green, fontSize: 16)),
             ],
-          ),
-          content: Text(
-            "Seu agendamento foi realizado com sucesso!",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize:
-                  16, // Tamanho da fonte ajustado para melhorar a legibilidade
-            ),
           ),
           actions: [
             Center(
-              child: TextButton(
-                child: Text("Ok"),
+              child: ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  Navigator.pop(context);
                 },
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.green, // Cor de fundo do botão
-                  foregroundColor: Colors.white, // Cor do texto
+                child: Text("Ok", style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(20), // Bordas arredondadas
-                  ),
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 12), // Padding
+                      borderRadius: BorderRadius.circular(20)),
                 ),
               ),
             ),
@@ -379,43 +337,52 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Horários de ${widget.tecnico['nome']}',
+        title: Text("Horários Disponíveis",
             style: TextStyle(fontSize: 20, color: Colors.white)),
-        centerTitle: true,
         backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-          ),
-          itemCount: horarios.length,
-          itemBuilder: (context, index) {
-            final horario = horarios[index];
-            return GestureDetector(
-              onTap: () =>
-                  horario.disponivel ? _showConfirmationDialog(horario) : null,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: horario.disponivel ? Colors.green : Colors.red,
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  horario.hora,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+      body: horarios.isEmpty
+          ? Center(
+              child: Text(
+                "Não há horários disponíveis para este técnico.",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
-            );
-          },
-        ),
-      ),
+            )
+          : GridView.builder(
+              padding: EdgeInsets.all(15),
+              itemCount: horarios.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 15,
+                crossAxisSpacing: 15,
+                childAspectRatio: 2.5,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                Horario horario = horarios[index];
+                return GestureDetector(
+                  onTap: horario.disponivel
+                      ? () => _showConfirmationDialog(horario)
+                      : null,
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: horario.disponivel ? Colors.green : Colors.red,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Text(
+                      horario.hora,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
