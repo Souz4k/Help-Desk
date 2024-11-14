@@ -31,16 +31,37 @@ class AtendimentosAgendados extends StatelessWidget {
         .collection('horarios')
         .where('uidUsuario', isEqualTo: userId)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => doc.data() as Map<String, dynamic>)
-            .toList());
+        .asyncMap((snapshot) async {
+      List<Map<String, dynamic>> agendamentos = [];
+
+      for (var doc in snapshot.docs) {
+        var data = doc.data();
+        if (data.containsKey('uidTecnico')) {
+          // Busca o nome do técnico na coleção de usuários
+          String uidTecnico = data['uidTecnico'];
+          DocumentSnapshot tecnicoDoc = await FirebaseFirestore.instance
+              .collection('users')  // Alterado para acessar a coleção correta
+              .doc(uidTecnico)
+              .get();
+
+          if (tecnicoDoc.exists) {
+            data['nomeTecnico'] = tecnicoDoc['nome'] ?? 'Nome não encontrado';
+          } else {
+            data['nomeTecnico'] = 'Nome não encontrado';
+          }
+        }
+        agendamentos.add(data);
+      }
+      return agendamentos;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: MinhasCores.azulEscuro,
+        title: Text("Histórico de Agendamentos"),
+        backgroundColor: Colors.blueAccent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -48,124 +69,116 @@ class AtendimentosAgendados extends StatelessWidget {
           },
         ),
       ),
-      endDrawer: Drawer(
-        child: ListView(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
           children: [
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text("Deslogar"),
-              onTap: () => _deslogar(context),
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 30),
-            child: Text(
-              "Histórico de Agendamentos",
-              style: TextStyle(fontSize: 25),
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _obterAgendamentosDoUsuario(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            Expanded(
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: _obterAgendamentosDoUsuario(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("Nenhum agendamento encontrado."));
-                }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                        child: Text("Nenhum agendamento encontrado."));
+                  }
 
-                final agendamentos = snapshot.data!;
+                  final agendamentos = snapshot.data!;
 
-                return ListView.builder(
-                  itemCount: agendamentos.length,
-                  itemBuilder: (context, index) {
-                    final agendamento = agendamentos[index];
+                  return ListView.builder(
+                    itemCount: agendamentos.length,
+                    itemBuilder: (context, index) {
+                      final agendamento = agendamentos[index];
 
-                    // Transformar a data do agendamento
-                    String? agendamentoId = agendamento['agendamentoId'];
-                    DateTime data;
-                    
-                    if (agendamentoId != null) {
-                      int? timestamp = int.tryParse(agendamentoId);
-                      if (timestamp != null && timestamp > 0) {
-                        data = DateTime.fromMillisecondsSinceEpoch(timestamp);
+                      // Transformar a data do agendamento
+                      String? agendamentoId = agendamento['agendamentoId'];
+                      DateTime data;
+
+                      if (agendamentoId != null) {
+                        int? timestamp = int.tryParse(agendamentoId);
+                        if (timestamp != null && timestamp > 0) {
+                          data = DateTime.fromMillisecondsSinceEpoch(timestamp);
+                        } else {
+                          data = DateTime
+                              .now(); // Usar data atual ou outro valor padrão
+                        }
                       } else {
-                        data = DateTime.now(); // Usar data atual ou outro valor padrão
+                        data = DateTime
+                            .now(); // Ou outro valor padrão se agendamentoId for nulo
                       }
-                    } else {
-                      data = DateTime.now(); // Ou outro valor padrão se agendamentoId for nulo
-                    }
 
-                    String dataFormatada = DateFormat('dd/MM/yyyy HH:mm:ss').format(data);
+                      String dataFormatada =
+                          DateFormat('dd/MM/yyyy HH:mm:ss').format(data);
 
-                    return GestureDetector(
-                      onTap: () {
-                        print("Agendamento clicado: ${agendamento['tipoAtendimento']}");
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: 75,
-                        margin: const EdgeInsets.only(top: 10),
-                        color: MinhasCores.brancogelo,
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                margin: const EdgeInsets.only(left: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(Icons.event),
+                      return GestureDetector(
+                        onTap: () {
+                          print(
+                              "Agendamento clicado: ${agendamento['tipoAtendimento']}");
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: MinhasCores.brancogelo,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
                               ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Nome: ${agendamento['nome'] ?? 'N/A'}",
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Tipo de atendimento: ${agendamento['problema'] ?? 'N/A'}",
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Data: $dataFormatada",
-                                    style: const TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Nome: ${agendamento['nome'] ?? 'N/A'}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Técnico: ${agendamento['nomeTecnico'] ?? 'N/A'}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Tipo de atendimento: ${agendamento['problema'] ?? 'N/A'}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Data: $dataFormatada",
+                                style: const TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
