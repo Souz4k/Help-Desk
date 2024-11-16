@@ -30,7 +30,10 @@ class telaInicialClienteState extends State<telaInicialCliente> {
 
   Future<void> _loadUserData() async {
     _user = FirebaseAuth.instance.currentUser!;
-    var userDoc = await FirebaseFirestore.instance.collection('users').doc(_user.uid).get();
+    var userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(_user.uid)
+        .get();
 
     if (userDoc.exists && userDoc.data()!.containsKey('fotourl')) {
       setState(() {
@@ -108,11 +111,12 @@ class telaInicialClienteState extends State<telaInicialCliente> {
             children: [
               GestureDetector(
                 onTap: () {
-                // Removido: _pickImageFromCamera(); // Adicione aqui a lógica para selecionar uma imagem da câmera
+                  // Removido: _pickImageFromCamera(); // Adicione aqui a lógica para selecionar uma imagem da câmera
                 },
                 child: CircleAvatar(
                   radius: 70,
-                  backgroundImage: _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                  backgroundImage:
+                      _imageUrl != null ? NetworkImage(_imageUrl!) : null,
                   backgroundColor: MinhasCores.brancogelo,
                   child: _imageUrl == null
                       ? Icon(Icons.person, size: 70, color: Colors.grey)
@@ -123,19 +127,15 @@ class telaInicialClienteState extends State<telaInicialCliente> {
               _buildMenuButton("Ajuda Técnica", Icons.build, () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SelecionarTecnicoScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => SelecionarTecnicoScreen()),
                 );
               }),
-              _buildMenuButton("Histórico de Técnicos", Icons.history, () {
+              _buildMenuButton("Histórico de Agendamenos", Icons.history, () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HistoricoCliente()),
-                );
-              }),
-              _buildMenuButton("Atendimentos Agendados", Icons.event, () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AtendimentosAgendados()),
+                  MaterialPageRoute(
+                      builder: (context) => AtendimentosAgendados()),
                 );
               }),
               _buildMenuButton("Suporte", Icons.help_outline, () {
@@ -156,7 +156,8 @@ class telaInicialClienteState extends State<telaInicialCliente> {
                   MaterialPageRoute(builder: (context) => AlterarInfoCli()),
                 );
               }),
-              _buildMenuButton("Deslogar", Icons.logout, () => _deslogar(context)),
+              _buildMenuButton(
+                  "Deslogar", Icons.logout, () => _deslogar(context)),
             ],
           ),
         ),
