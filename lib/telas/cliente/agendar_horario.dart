@@ -1,5 +1,6 @@
 import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/servicos/horario.dart';
+import 'package:app/telas/cliente/tela_inicial_cliente.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -349,8 +350,11 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
               child: TextButton(
                 child: Text("Ok"),
                 onPressed: () {
-                  Navigator.pop(context);
-                },
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => telaInicialCliente()),
+                );
+              },
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.green, // Cor de fundo do botão
                   foregroundColor: Colors.white, // Cor do texto
