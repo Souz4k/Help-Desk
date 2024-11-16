@@ -2,6 +2,7 @@ import 'package:app/servicos/horario.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 class AdicionarHorarioScreen extends StatefulWidget {
   @override
@@ -53,6 +54,11 @@ class _AdicionarHorarioScreenState extends State<AdicionarHorarioScreen> {
     setState(() {
       horarios = fetchedHorarios;
     });
+  }
+
+  String formatarData(String data) {
+    DateTime dateTime = DateTime.parse(data);
+    return DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
   }
 
   Future<void> _addHorario() async {
@@ -116,12 +122,12 @@ class _AdicionarHorarioScreenState extends State<AdicionarHorarioScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Horário Inválido"),
-          content: Text(
+          title: const Text("Horário Inválido"),
+          content: const Text(
               "Você não pode adicionar um horário no passado. Por favor, selecione um horário atual ou futuro."),
           actions: [
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -137,12 +143,12 @@ class _AdicionarHorarioScreenState extends State<AdicionarHorarioScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Horário Duplicado"),
-          content: Text(
+          title: const Text("Horário Duplicado"),
+          content: const Text(
               "Este horário já foi adicionado. Por favor, selecione um horário diferente."),
           actions: [
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -166,17 +172,17 @@ class _AdicionarHorarioScreenState extends State<AdicionarHorarioScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Remover Horário"),
-          content: Text("Você deseja remover este horário?"),
+          title: const Text("Remover Horário"),
+          content: const Text("Você deseja remover este horário?"),
           actions: [
             TextButton(
-              child: Text("Cancelar"),
+              child: const Text("Cancelar"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Confirmar"),
+              child: const Text("Confirmar"),
               onPressed: () {
                 _removeHorario(id);
                 Navigator.of(context).pop();
@@ -192,52 +198,91 @@ class _AdicionarHorarioScreenState extends State<AdicionarHorarioScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Adicionar Horário'),
+        backgroundColor: Colors.blueAccent,
+        title: const Text(
+          'Adicionar Horário',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: _addHorario,
-              child: Text('Adicionar Horário'),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: horarios.length,
-                itemBuilder: (context, index) {
-                  final horario = horarios[index];
-                  return ListTile(
-                    title: Text(horario.hora),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (horario.nome != null) Text('Nome: ${horario.nome}'),
-                        if (horario.configuracao != null)
-                          Text('Configuração: ${horario.configuracao}'),
-                        if (horario.problema != null)
-                          Text('Problema: ${horario.problema}'),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.check,
-                          color: horario.disponivel ? Colors.green : Colors.red,
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () =>
-                              _showRemoveConfirmationDialog(horario.id),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+      body: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _addHorario,
+                icon: const Icon(Icons.add),
+                label: const Text('Adicionar Horário'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  textStyle: const TextStyle(fontSize: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: horarios.length,
+                  itemBuilder: (context, index) {
+                    final horario = horarios[index];
+                    return Card(
+                      elevation: 6,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      color: Colors.white, // Light background color
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Horário with Icon
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Horário text with icon
+                                Row(
+                                  children: [
+                                    Icon(Icons.access_time,
+                                        color: Colors.blueAccent, size: 20),
+                                    SizedBox(width: 8), // Space between icon and text
+                                    Text(
+                                      formatarData(horario.hora),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // Delete Icon Button
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red.shade600,
+                                  ),
+                                  onPressed: () {
+                                    _showRemoveConfirmationDialog(horario.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
