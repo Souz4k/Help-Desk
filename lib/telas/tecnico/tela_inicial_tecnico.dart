@@ -1,7 +1,7 @@
 import 'package:app/telas/Tela_inicial.dart';
-import 'package:app/telas/tecnico/adicionar_horario.dart';
-import 'package:flutter/material.dart';
 import 'package:app/telas/cliente/geolocalizacao_cli.dart';
+import 'package:flutter/material.dart';
+import 'package:app/telas/tecnico/adicionar_horario.dart';
 import 'package:app/telas/suporte.dart';
 import 'package:app/telas/tecnico/alterar_info_Tec.dart';
 import 'package:app/_comum/minhas_cores.dart';
@@ -19,6 +19,7 @@ class Tela_inicial_tecnico extends StatefulWidget {
 class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
   late User _user;
   String? _imageUrl;
+  String? _userName;
 
   @override
   void initState() {
@@ -28,11 +29,15 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
 
   Future<void> _loadUserData() async {
     _user = FirebaseAuth.instance.currentUser!;
-    var userDoc = await FirebaseFirestore.instance.collection('users').doc(_user.uid).get();
+    var userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(_user.uid)
+        .get();
 
-    if (userDoc.exists && userDoc.data()!.containsKey('fotourl')) {
+    if (userDoc.exists) {
       setState(() {
         _imageUrl = userDoc['fotourl'];
+        _userName = userDoc['nome'] ?? 'Usuário';
       });
     }
   }
@@ -49,137 +54,120 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: MinhasCores.azulEscuro,
-        automaticallyImplyLeading: false,
-      ),
-      endDrawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Deslogar"),
-              onTap: () => _deslogar(context),
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text("Informações"),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AlterarInfotec()),
-                );
-              },
+  Widget _buildMenuItem(
+      String title, IconData icon, VoidCallback onTap, Color color) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 4),
             ),
           ],
         ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.blueAccent, size: 28),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios,
+                color: Colors.black26, size: 20),
+          ],
+        ),
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.only(top: 50),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(220), // Aumentando a altura do AppBar
+        child: AppBar(
+          backgroundColor: Colors.blueAccent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: MinhasCores.brancogelo,
-                    shape: BoxShape.circle,
-                    image: _imageUrl != null
-                        ? DecorationImage(
-                            image: NetworkImage(_imageUrl!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage:
+                      _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                  backgroundColor: Colors.white.withOpacity(0.3),
+                  child: _imageUrl == null
+                      ? const Icon(Icons.person, size: 60, color: Colors.white)
+                      : null,
                 ),
-                SizedBox(height: 70),
-                GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AdicionarHorarioScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 75,
-                    margin: EdgeInsets.only(top: 0),
-                    color: MinhasCores.brancogelo,
-                    child: Center(
-                      child: Text(
-                        "Agendamento",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Suporte(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 75,
-                    margin: EdgeInsets.only(top: 0),
-                    color: Colors.white,
-                    child: Center(
-                      child: Text(
-                        "Suporte",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Geolocalizacao(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 75,
-                    margin: EdgeInsets.only(top: 0),
-                    color: MinhasCores.brancogelo,
-                    child: Center(
-                      child: Text(
-                        "Agendamentos na Região",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                      ),
+                const SizedBox(height: 15),
+                SingleChildScrollView(
+                  // Adicionado para evitar o overflow
+                  child: Text(
+                    "Olá, ${_userName ?? 'Técnico'}",
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 22, // Reduzido o tamanho da fonte
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+      body: Container(
+        color: Colors.grey[100],
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            _buildMenuItem("Agendamento", Icons.calendar_today, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AdicionarHorarioScreen()),
+              );
+            }, Colors.white),
+            _buildMenuItem("Suporte", Icons.help_outline, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Suporte()),
+              );
+            }, Colors.white),
+            _buildMenuItem("Agendamentos na Região", Icons.location_on, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Geolocalizacao()),
+              );
+            }, Colors.white),
+            _buildMenuItem("Informações", Icons.person, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AlterarInfotec()),
+              );
+            }, Colors.white),
+            _buildMenuItem("Deslogar", Icons.logout, () => _deslogar(context),
+                Colors.white),
+          ],
         ),
       ),
     );
