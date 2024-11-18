@@ -1,4 +1,6 @@
 import 'package:app/componentes/decoracao_campo_autenticacao.dart';
+import 'package:app/telas/cliente/tela_inicial_cliente.dart';
+import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,9 +8,11 @@ import 'package:app/servicos/autenticacao_servico.dart';
 import 'package:app/telas/Tela_inicial.dart';
 import 'package:app/_comum/meu_snackbar.dart';
 import 'package:app/_comum/minhas_cores.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class AlterarInfotec extends StatefulWidget {
   const AlterarInfotec({Key? key});
@@ -18,6 +22,13 @@ class AlterarInfotec extends StatefulWidget {
 }
 
 class _AlterarInfotecState extends State<AlterarInfotec> {
+  final maskFormatter = MaskTextInputFormatter(
+    mask: '(##)#####-####',
+    filter: {
+      "#": RegExp(r'[0-9]'), // Permite apenas números
+    },
+  );
+
   late TextEditingController _nomeController;
   late TextEditingController _senhaAtualController;
   late TextEditingController _novaSenhaController;
@@ -65,7 +76,8 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
 
       if (diplomasDoc.docs.isNotEmpty) {
         setState(() {
-          _diplomaUrls = diplomasDoc.docs.map((doc) => doc['url'] as String).toList();
+          _diplomaUrls =
+              diplomasDoc.docs.map((doc) => doc['url'] as String).toList();
         });
       }
     }
@@ -84,8 +96,123 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     }
   }
 
-  Future<void> _atualizarInformacoes(
-      String newName, String oldPassword, String newSenha, String celular) async {
+  void _navigateToHomeScreen() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => Tela_inicial_tecnico()),
+    );
+  }
+
+  Future<void> _showErrorDialog(String errorMessage) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.error, color: Colors.red, size: 30),
+              SizedBox(width: 10),
+              Text(
+                'Erro',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  "Erro ao Atualizar Informações",
+                  style: TextStyle(fontSize: 18, color: Colors.black87),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                child: Text(
+                  'OK',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSuccessDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 30),
+              SizedBox(width: 10),
+              Text(
+                'Sucesso',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Informações atualizadas com sucesso!',
+                  style: TextStyle(fontSize: 18, color: Colors.black87),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _navigateToHomeScreen();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                child: Text(
+                  'OK',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _atualizarInformacoes(String newName, String oldPassword,
+      String newSenha, String celular) async {
     try {
       if (_user != null) {
         var credential = EmailAuthProvider.credential(
@@ -114,36 +241,24 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               .set(updateData, SetOptions(merge: true));
         }
 
-        final snackBar = SnackBar(
-          content: Text(
-            "Informações atualizadas com sucesso",
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.green,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        _showSuccessDialog();
       }
     } catch (e) {
       print("Erro ao atualizar informações: $e");
-      final snackBar = SnackBar(
-        content: Text(
-          "Erro ao atualizar informações",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.red,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      _showErrorDialog("Erro ao atualizar informações: ${e.toString()}");
     }
   }
 
   Future<void> _pickDiplomaImage() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.camera);
 
     if (returnedImage == null) return;
     File selectedImage = File(returnedImage.path);
 
     final storageRef = FirebaseStorage.instance.ref();
-    final imageref = storageRef.child("${_user!.uid}/diplomas/${DateTime.now().millisecondsSinceEpoch}.jpg");
+    final imageref = storageRef.child(
+        "${_user!.uid}/diplomas/${DateTime.now().millisecondsSinceEpoch}.jpg");
     await imageref.putFile(selectedImage);
     var url = await imageref.getDownloadURL();
 
@@ -165,7 +280,8 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     File selectedImage = File(returnedImage.path);
 
     final storageRef = FirebaseStorage.instance.ref();
-    final imageref = storageRef.child("${FirebaseAuth.instance.currentUser!.uid}.jpg");
+    final imageref =
+        storageRef.child("${FirebaseAuth.instance.currentUser!.uid}.jpg");
     await imageref.putFile(selectedImage);
     var url = await imageref.getDownloadURL();
 
@@ -210,22 +326,55 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     );
   }
 
+  Widget _buildTextField(
+      TextEditingController controller, String labelText, bool obscureText) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(color: Colors.black),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0), // Bordas arredondadas
+        ),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blueAccent)),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      obscureText: obscureText,
+    );
+  }
+
+  Widget _buildCellphoneField() {
+    return TextFormField(
+      controller: _celularController,
+      decoration: InputDecoration(
+        labelText: 'Celular',
+        labelStyle: TextStyle(color: Colors.black),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0), // Bordas arredondadas
+        ),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blueAccent)),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      keyboardType: TextInputType.phone,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly, // Permite apenas dígitos
+        maskFormatter, // Aplica a máscara
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: MinhasCores.azulEscuro,
-      ),
-      endDrawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Deslogar"),
-              onTap: () => _deslogar(context),
-            ),
-          ],
-        ),
+        title: Text("Alterar Informações",
+            style: TextStyle(fontSize: 20, color: Colors.white)),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -257,38 +406,20 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                 ),
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _nomeController,
-                decoration: getAutenticationInputDecoration("Nome"),
+              _buildTextField(_nomeController, 'Nome', false),
+              SizedBox(height: 20),
+              _buildTextField(_senhaAtualController, 'Senha Atual', true),
+              SizedBox(height: 20),
+              _buildTextField(_novaSenhaController, 'Nova Senha', true),
+              Text(
+                'A senha deve ter no mínimo 6 caracteres.',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _senhaAtualController,
-                decoration: getAutenticationInputDecoration("Senha Antiga"),
-                obscureText: true,
-              ),
+              _buildCellphoneField(),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _novaSenhaController,
-                decoration: getAutenticationInputDecoration("Nova Senha"),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "A senha não pode ser vazia";
-                  }
-                  if (value.length < 6) {
-                    return "A senha é muito curta";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _celularController,
-                decoration: getAutenticationInputDecoration("Número de Celular"),
-              ),
-              SizedBox(height: 20),
-              Text("Diplomas:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text("Diplomas:",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10),
               _diplomaUrls.isNotEmpty
                   ? Container(
@@ -298,7 +429,8 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                         itemCount: _diplomaUrls.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Image.network(
                               _diplomaUrls[index],
                               width: 100,
@@ -314,10 +446,16 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               ElevatedButton(
                 onPressed: _pickDiplomaImage,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: MinhasCores.azulEscuro,
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
                 ),
-                child: Text("Adicionar Diploma",
-                    style: TextStyle(color: Colors.white)),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Text("Adicionar Diploma",
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -330,10 +468,16 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: MinhasCores.azulEscuro,
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
                 ),
-                child: Text("Atualizar Informações",
-                    style: TextStyle(color: Colors.white)),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Text("Atualizar Informações",
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
               ),
             ],
           ),
