@@ -249,72 +249,72 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      backgroundColor: Colors.blueAccent,
-      title: Text("Alterar Informações",
-          style: TextStyle(fontSize: 20, color: Colors.white)),
-      centerTitle: true,
-    ),
-    body: SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: () => _showImageSourceActionSheet(context),
-              child: CircleAvatar(
-                radius: 75,
-                backgroundColor: Colors.grey[300],
-                backgroundImage:
-                    _imageUrl != null ? NetworkImage(_imageUrl!) : null,
-                child: _imageUrl == null
-                    ? Icon(Icons.camera_alt_outlined,
-                        size: 70, color: Colors.grey[600])
-                    : null,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
+        title: Text("Alterar Informações",
+            style: TextStyle(fontSize: 20, color: Colors.white)),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () => _showImageSourceActionSheet(context),
+                child: CircleAvatar(
+                  radius: 75,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage:
+                      _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                  child: _imageUrl == null
+                      ? Icon(Icons.camera_alt_outlined,
+                          size: 70, color: Colors.grey[600])
+                      : null,
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            _buildTextField(_nomeController, 'Nome', false),
-            SizedBox(height: 20),
-            _buildTextField(_senhaAtualController, 'Senha Atual', true),
-            SizedBox(height: 20),
-            _buildTextField(_novaSenhaController, 'Nova Senha', true),
-            // Adicionando o texto informativo abaixo do campo de nova senha
-            Text(
-              'A senha deve ter no mínimo 6 caracteres.',
-              style: TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-            SizedBox(height: 20),
-            _buildCellphoneField(),
-            SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () async {
-                await _atualizarInformacoes(
-                  _nomeController.text,
-                  _senhaAtualController.text,
-                  _novaSenhaController.text,
-                  _celularController.text,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0)),
+              SizedBox(height: 20),
+              _buildTextField(_nomeController, 'Nome', false),
+              SizedBox(height: 20),
+              _buildTextField(_senhaAtualController, 'Senha Atual', true),
+              SizedBox(height: 20),
+              _buildTextField(_novaSenhaController, 'Nova Senha', true),
+              // Adicionando o texto informativo abaixo do campo de nova senha
+              Text(
+                'A senha deve ter no mínimo 6 caracteres.',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Text("Atualizar Informações",
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
+              SizedBox(height: 20),
+              _buildCellphoneField(),
+              SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () async {
+                  await _atualizarInformacoes(
+                    _nomeController.text,
+                    _senhaAtualController.text,
+                    _novaSenhaController.text,
+                    _celularController.text,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Text("Atualizar Informações",
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildTextField(
       TextEditingController controller, String labelText, bool obscureText) {
@@ -323,7 +323,9 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(color: Colors.black),
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0), // Bordas arredondadas
+        ),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.blueAccent)),
         filled: true,
@@ -339,7 +341,9 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
       decoration: InputDecoration(
         labelText: 'Celular',
         labelStyle: TextStyle(color: Colors.black),
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0), // Bordas arredondadas
+        ),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.blueAccent)),
         filled: true,
