@@ -367,6 +367,85 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     );
   }
 
+  Future<void> _deleteDiploma(String url) async {
+    try {
+      // Remover do Firestore
+      final diplomas = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(_user!.uid)
+          .collection("diplomas")
+          .where("url", isEqualTo: url)
+          .get();
+
+      for (var doc in diplomas.docs) {
+        await doc.reference.delete();
+      }
+
+      // Remover do Storage
+      final storageRef = FirebaseStorage.instance.refFromURL(url);
+      await storageRef.delete();
+
+      setState(() {
+        _diplomaUrls.remove(url);
+      });
+    } catch (e) {
+      print("Erro ao deletar diploma: $e");
+    }
+  }
+
+  Widget _buildDiplomaGrid() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 10),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3, // 3 imagens por linha
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: _diplomaUrls.length,
+          itemBuilder: (context, index) {
+            final url = _diplomaUrls[index];
+            return Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade300, width: 2),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: GestureDetector(
+                    onTap: () => _deleteDiploma(url),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.redAccent,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -418,30 +497,10 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               SizedBox(height: 20),
               _buildCellphoneField(),
               SizedBox(height: 20),
-              Text("Diplomas:",
+              Text("Meus Diplomas:",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10),
-              _diplomaUrls.isNotEmpty
-                  ? Container(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _diplomaUrls.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Image.network(
-                              _diplomaUrls[index],
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  : Text("Nenhum diploma adicionado."),
+              _buildDiplomaGrid(),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: _pickDiplomaImage,
