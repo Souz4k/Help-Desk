@@ -453,6 +453,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text("Alterar Informações",
             style: TextStyle(fontSize: 20, color: Colors.white)),

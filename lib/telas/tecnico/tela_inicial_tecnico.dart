@@ -136,7 +136,8 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
         ),
       ),
       body: Container(
-        color: Colors.grey[100],
+        
+        color: Colors.white,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
