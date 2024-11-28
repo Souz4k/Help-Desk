@@ -170,7 +170,7 @@ class telaInicialClienteState extends State<telaInicialCliente> {
                 MaterialPageRoute(builder: (context) => AlterarInfoCli()),
               );
             }),
-            _buildMenuItem("Deslogar", Icons.logout, () => _deslogar(context)),
+            _buildMenuItem("Sair", Icons.logout, () => _deslogar(context)),
           ],
         ),
       ),
