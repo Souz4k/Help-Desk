@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:app/telas/tecnico/adicionar_horario.dart';
 import 'package:app/telas/suporte.dart';
 import 'package:app/telas/tecnico/alterar_info_Tec.dart';
-import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -98,77 +97,88 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(220), // Aumentando a altura do AppBar
+        preferredSize: const Size.fromHeight(220),
         child: AppBar(
           backgroundColor: Colors.blueAccent,
           elevation: 0,
           automaticallyImplyLeading: false,
-          flexibleSpace: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 60,
-                  backgroundImage:
-                      _imageUrl != null ? NetworkImage(_imageUrl!) : null,
-                  backgroundColor: Colors.white.withOpacity(0.3),
-                  child: _imageUrl == null
-                      ? const Icon(Icons.person, size: 60, color: Colors.white)
-                      : null,
-                ),
-                const SizedBox(height: 15),
-                SingleChildScrollView(
-                  // Adicionado para evitar o overflow
-                  child: Text(
-                    "Olá, ${_userName ?? 'Técnico'}",
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 22, // Reduzido o tamanho da fonte
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+          flexibleSpace: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundImage:
+                        _imageUrl != null ? NetworkImage(_imageUrl!) : null,
+                    backgroundColor: Colors.white.withOpacity(0.3),
+                    child: _imageUrl == null
+                        ? const Icon(Icons.person,
+                            size: 60, color: Colors.white)
+                        : null,
+                  ),
+                  const SizedBox(height: 10),
+                  Flexible(
+                    child: Text(
+                      "Olá, ${_userName ?? 'Técnico'}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
-      body: Container(
-        
-        color: Colors.white,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            _buildMenuItem("Agendamento", Icons.calendar_today, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AdicionarHorarioScreen()),
-              );
-            }, Colors.white),
-            _buildMenuItem("Suporte", Icons.help_outline, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Suporte()),
-              );
-            }, Colors.white),
-            _buildMenuItem("Agendamentos na Região", Icons.location_on, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Geolocalizacao()),
-              );
-            }, Colors.white),
-            _buildMenuItem("Informações", Icons.person, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AlterarInfotec()),
-              );
-            }, Colors.white),
-            _buildMenuItem("Deslogar", Icons.logout, () => _deslogar(context),
-                Colors.white),
-          ],
+      body: SafeArea(
+        child: Container(
+          color: Colors.white,
+          height: MediaQuery.of(context).size.height -
+              MediaQuery.of(context).padding.top, // Preenche toda a altura
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  _buildMenuItem("Agendamento", Icons.calendar_today, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AdicionarHorarioScreen()),
+                    );
+                  }, Colors.white),
+                  _buildMenuItem("Suporte", Icons.help_outline, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Suporte()),
+                    );
+                  }, Colors.white),
+                  _buildMenuItem("Agendamentos na Região", Icons.location_on,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Geolocalizacao()),
+                    );
+                  }, Colors.white),
+                  _buildMenuItem("Informações", Icons.person, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AlterarInfotec()),
+                    );
+                  }, Colors.white),
+                  _buildMenuItem("Sair", Icons.logout,
+                      () => _deslogar(context), Colors.white),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
