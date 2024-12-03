@@ -19,7 +19,6 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
   final Set<Marker> _markers = {};
   Position? _currentPosition;
   bool _isLoading = true;
-  String _userType = '';
 
   @override
   void initState() {
@@ -33,37 +32,18 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
       setState(() {
         _currentPosition = position;
       });
+
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-        String userType =
-            userSnapshot.exists ? userSnapshot.get('userType') : 'tecnico';
-        setState(() {
-          _userType = userType;
-        });
-
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .set({
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'location': {
             'latitude': position.latitude,
             'longitude': position.longitude,
           },
-          'userType': userType,
-          'name': user.displayName ?? 'Sem Nome',
         }, SetOptions(merge: true));
 
-        _addMarker(
-          LatLng(position.latitude, position.longitude),
-          user.uid,
-          user.displayName ?? 'Sua Localização',
-        );
-        await _loadUserLocations(
-            position.latitude, position.longitude, userType);
+        // Carregar todas as localizações dos técnicos
+        await _loadTechniciansLocations();
       }
     } catch (e) {
       print('Erro ao determinar e salvar a posição: $e');
@@ -75,15 +55,12 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
   }
 
   Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Serviços de localização desativados.');
     }
 
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
@@ -91,7 +68,7 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
       }
     } else if (permission == LocationPermission.deniedForever) {
       return Future.error(
-          'Permissões de localização permanentemente negadas. Não é possível solicitar permissões.');
+          'Permissões de localização permanentemente negadas.');
     }
 
     return await Geolocator.getCurrentPosition(
@@ -99,69 +76,38 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
     );
   }
 
-  Future<void> _loadUserLocations(
-      double latitude, double longitude, String userType) async {
+  Future<void> _loadTechniciansLocations() async {
     final snapshot = await FirebaseFirestore.instance.collection('users').get();
-    final users = snapshot.docs.where((doc) {
+    final technicians = snapshot.docs.where((doc) {
       final data = doc.data();
-      if (data.containsKey('location')) {
-        final location = data['location'];
-        bool isNearby = location != null &&
-            location.containsKey('latitude') &&
-            location.containsKey('longitude') &&
-            _isNearby(location['latitude'], location['longitude'], latitude,
-                longitude);
-
-        // Filtrar usuários com base no tipo de usuário
-        if (userType == 'tecnico' && data['userType'] == 'cliente') {
-          return false; // Técnicos não veem clientes
-        } else if (userType == 'cliente' && data['userType'] == 'tecnico') {
-          return isNearby; // Clientes veem técnicos próximos
-        }
-
-        return false;
-      }
-      return false;
+      return data['userType'] == 'tecnico' &&
+          data['location'] != null &&
+          data['location']['latitude'] != null &&
+          data['location']['longitude'] != null;
     });
 
     setState(() {
       _markers.clear();
-      for (var user in users) {
-        final data = user.data();
+      for (var tech in technicians) {
+        final data = tech.data();
         final location = data['location'];
         _addMarker(
           LatLng(location['latitude'], location['longitude']),
-          user.id,
+          tech.id,
           data['name'] ?? 'Sem Nome',
         );
       }
     });
   }
 
-  bool _isNearby(double techLat, double techLng, double userLat, double userLng,
-      {double radiusInKm = 10}) {
-    const double earthRadius = 6371;
-    double dLat = _degreesToRadians(techLat - userLat);
-    double dLng = _degreesToRadians(techLng - userLng);
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_degreesToRadians(userLat)) * cos(_degreesToRadians(techLat)) *
-            sin(dLng / 2) * sin(dLng / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    double distance = earthRadius * c;
-
-    return distance <= radiusInKm;
-  }
-
-  double _degreesToRadians(double degrees) {
-    return degrees * pi / 180;
-  }
-
   void _addMarker(LatLng position, String id, String title) {
-    _markers.add(Marker(
-      markerId: MarkerId(id),
-      position: position,
-      infoWindow: InfoWindow(title: title),
-    ));
+    _markers.add(
+      Marker(
+        markerId: MarkerId(id),
+        position: position,
+        infoWindow: InfoWindow(title: title),
+      ),
+    );
     setState(() {});
   }
 
@@ -179,11 +125,7 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
 
   void _onItemTapped(int index) {
     setState(() {
-      if (index == 0 && _selectedIndex != 0) {
-        Navigator.pop(context);
-      } else {
-        _selectedIndex = index;
-      }
+      _selectedIndex = index;
     });
   }
 
@@ -208,7 +150,7 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
               label: 'Voltar',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person),
+              icon: Icon(Icons.map),
               label: 'Mapa',
             ),
             BottomNavigationBarItem(
