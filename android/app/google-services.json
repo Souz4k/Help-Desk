@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "69222600837",
+    "project_id": "tg-fatec-4b561",
+    "storage_bucket": "tg-fatec-4b561.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69222600837:android:51b4d58d06a7a82266d9ec",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx1s9ahU78HxDaw2KdQ_4q4WMiLhmCof0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
