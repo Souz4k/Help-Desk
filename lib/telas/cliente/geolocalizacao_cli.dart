@@ -45,10 +45,7 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
           _userType = userType;
         });
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .set({
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'location': {
             'latitude': position.latitude,
             'longitude': position.longitude,
@@ -144,8 +141,10 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
     double dLat = _degreesToRadians(techLat - userLat);
     double dLng = _degreesToRadians(techLng - userLng);
     double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_degreesToRadians(userLat)) * cos(_degreesToRadians(techLat)) *
-            sin(dLng / 2) * sin(dLng / 2);
+        cos(_degreesToRadians(userLat)) *
+            cos(_degreesToRadians(techLat)) *
+            sin(dLng / 2) *
+            sin(dLng / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     double distance = earthRadius * c;
 
