@@ -97,14 +97,16 @@ class telaInicialClienteState extends State<telaInicialCliente> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(220), // Increase the height for more space
+        preferredSize:
+            Size.fromHeight(220), // Increase the height for more space
         child: AppBar(
           backgroundColor: Colors.blueAccent,
           elevation: 0,
           automaticallyImplyLeading: false, // Remove the back button
           flexibleSpace: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-            child: SingleChildScrollView( // Wrap in a scroll view to avoid overflow
+            child: SingleChildScrollView(
+              // Wrap in a scroll view to avoid overflow
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -114,7 +116,8 @@ class telaInicialClienteState extends State<telaInicialCliente> {
                         _imageUrl != null ? NetworkImage(_imageUrl!) : null,
                     backgroundColor: Colors.white.withOpacity(0.3),
                     child: _imageUrl == null
-                        ? const Icon(Icons.person, size: 60, color: Colors.white)
+                        ? const Icon(Icons.person,
+                            size: 60, color: Colors.white)
                         : null,
                   ),
                   const SizedBox(height: 15),
@@ -122,7 +125,8 @@ class telaInicialClienteState extends State<telaInicialCliente> {
                     "Olá, ${_userName ?? 'Usuário'}",
                     overflow: TextOverflow.ellipsis, // Prevent text overflow
                     style: const TextStyle(
-                      fontSize: 24, // Slightly smaller font size for better spacing
+                      fontSize:
+                          24, // Slightly smaller font size for better spacing
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -170,7 +174,7 @@ class telaInicialClienteState extends State<telaInicialCliente> {
                 MaterialPageRoute(builder: (context) => AlterarInfoCli()),
               );
             }),
-            _buildMenuItem("Deslogar", Icons.logout, () => _deslogar(context)),
+            _buildMenuItem("Sair", Icons.logout, () => _deslogar(context)),
           ],
         ),
       ),
