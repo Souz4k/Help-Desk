@@ -1,5 +1,3 @@
-import 'package:app/componentes/decoracao_campo_autenticacao.dart';
-import 'package:app/telas/cliente/tela_inicial_cliente.dart';
 import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
