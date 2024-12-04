@@ -1,3 +1,4 @@
+import 'package:app/telas/tecnico/a.dart';
 import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -519,6 +520,22 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                     style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
               SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TelaLocalizacaoTecnico()),
+                  );
+                },
+                child: Text('A',
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
               Text("Meus Diplomas:",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10),
