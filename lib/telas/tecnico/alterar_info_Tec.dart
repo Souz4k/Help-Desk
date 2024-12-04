@@ -1,5 +1,4 @@
-import 'package:app/componentes/decoracao_campo_autenticacao.dart';
-import 'package:app/telas/cliente/tela_inicial_cliente.dart';
+import 'package:app/telas/tecnico/a.dart';
 import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +8,8 @@ import 'package:app/telas/Tela_inicial.dart';
 import 'package:app/_comum/meu_snackbar.dart';
 import 'package:app/_comum/minhas_cores.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:app/telas/tecnico/localizacao.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -227,7 +228,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
           await FirebaseFirestore.instance
               .collection('users')
               .doc(_user!.uid)
-              .update({'nome': newName});
+              .update({'name': newName});
         }
         if (newSenha.isNotEmpty) {
           await _user!.updatePassword(newSenha);
@@ -388,6 +389,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
       // Remover do Storage
       final storageRef = FirebaseStorage.instance.refFromURL(url);
       await storageRef.delete();
+
       setState(() {
         _diplomaUrls.remove(url);
       });
@@ -501,6 +503,39 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               SizedBox(height: 20),
               _buildCellphoneField(),
               SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChooseLocationScreen()),
+                  );
+                },
+                child: Text('Escolher Localização',
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TelaLocalizacaoTecnico()),
+                  );
+                },
+                child: Text('A',
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
               Text("Meus Diplomas:",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10),
