@@ -29,6 +29,9 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
       "#": RegExp(r'[0-9]'), // Permite apenas números
     },
   );
+  late GoogleMapController _mapController;
+  LatLng? _tecnicoLocalizacao;
+  bool _isLoading = true;
 
   late TextEditingController _nomeController;
   late TextEditingController _senhaAtualController;
@@ -50,6 +53,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     _celularController = TextEditingController();
     _loadUserData();
     _loadDiplomaImages();
+    _loadTecnicoLocalizacao();
   }
 
   Future<void> _loadUserData() async {
@@ -64,6 +68,44 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
           _imageUrl = userDoc['fotourl'];
         });
       }
+    }
+  }
+
+  Future<void> _loadTecnicoLocalizacao() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        DocumentSnapshot<Map<String, dynamic>> snapshot =
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .get();
+
+        if (snapshot.exists && snapshot.data() != null) {
+          var data = snapshot.data()!;
+
+          // Verifica se o campo 'location' existe e contém latitude e longitude
+          if (data.containsKey('location')) {
+            var location = data['location'];
+
+            if (location.containsKey('latitude') &&
+                location.containsKey('longitude')) {
+              setState(() {
+                _tecnicoLocalizacao = LatLng(
+                  location['latitude'],
+                  location['longitude'],
+                );
+              });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Erro ao carregar localização: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -490,7 +532,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 40),
               _buildTextField(_nomeController, 'Nome', false),
               SizedBox(height: 20),
               _buildTextField(_senhaAtualController, 'Senha Atual', true),
@@ -502,7 +544,54 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               ),
               SizedBox(height: 20),
               _buildCellphoneField(),
-              SizedBox(height: 20),
+              SizedBox(height: 30),
+              Text("Minha Localização:",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : _tecnicoLocalizacao == null
+                      ? Center(child: Text('Localização não definida'))
+                      : Container(
+                          height: 200, // Define a altura do bloco
+                          width: 300,
+                          margin:
+                              EdgeInsets.all(16), // Margem ao redor do bloco
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                10), // Bordas arredondadas
+                            border: Border.all(
+                                color: Colors.grey), // Borda ao redor
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                                10), // Aplica bordas arredondadas ao mapa
+                            child: GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: _tecnicoLocalizacao!,
+                                zoom: 16,
+                              ),
+                              markers: {
+                                Marker(
+                                  markerId: MarkerId('tecnicoLocation'),
+                                  position: _tecnicoLocalizacao!,
+                                  infoWindow: InfoWindow(
+                                    title: 'Seu Local',
+                                  ),
+                                )
+                              },
+                              onMapCreated: (controller) {
+                                _mapController = controller;
+                              },
+                              myLocationEnabled: false,
+                              zoomGesturesEnabled: false,
+                              scrollGesturesEnabled: false,
+                              rotateGesturesEnabled: false,
+                              zoomControlsEnabled:
+                                  false, // Desativa os botões de zoom
+                              mapToolbarEnabled: false,
+                            ),
+                          ),
+                        ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
@@ -520,27 +609,12 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                     style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0)),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TelaLocalizacaoTecnico()),
-                  );
-                },
-                child: Text('A',
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
-              ),
+              SizedBox(height: 20),
               Text("Meus Diplomas:",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               SizedBox(height: 10),
               _buildDiplomaGrid(),
-              SizedBox(height: 10),
+              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _pickDiplomaImage,
                 style: ElevatedButton.styleFrom(
@@ -555,7 +629,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                       style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               ElevatedButton(
                 onPressed: () async {
                   await _atualizarInformacoes(
@@ -566,7 +640,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: const Color.fromARGB(255, 38, 114, 245),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0)),
                 ),
@@ -574,7 +648,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: Text("Atualizar Informações",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                      style: TextStyle(color: Colors.white, fontSize: 20)),
                 ),
               ),
             ],
@@ -590,6 +664,7 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
     _senhaAtualController.dispose();
     _novaSenhaController.dispose();
     _celularController.dispose();
+    _mapController.dispose();
     super.dispose();
   }
 }

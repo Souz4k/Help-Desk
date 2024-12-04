@@ -67,27 +67,43 @@ class _TelaLocalizacaoTecnicoState extends State<TelaLocalizacaoTecnico> {
           ? Center(child: CircularProgressIndicator())
           : _tecnicoLocalizacao == null
               ? Center(child: Text('Localização não encontrada'))
-              : GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: _tecnicoLocalizacao!,
-                    zoom: 16,
+              : Container(
+                  height: 200, // Define a altura do bloco
+                  width: 300, 
+                  margin: EdgeInsets.all(16), // Margem ao redor do bloco
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(10), // Bordas arredondadas
+                    border: Border.all(color: Colors.grey), // Borda ao redor
                   ),
-                  markers: {
-                    Marker(
-                      markerId: MarkerId('tecnicoLocation'),
-                      position: _tecnicoLocalizacao!,
-                      infoWindow: InfoWindow(
-                        title: 'Localização do Técnico',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                        10), // Aplica bordas arredondadas ao mapa
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: _tecnicoLocalizacao!,
+                        zoom: 16,
                       ),
-                    )
-                  },
-                  onMapCreated: (controller) {
-                    _mapController = controller;
-                  },
-                  myLocationEnabled: false,
-                  zoomGesturesEnabled: false,
-                  scrollGesturesEnabled: false,
-                  rotateGesturesEnabled: false,
+                      markers: {
+                        Marker(
+                          markerId: MarkerId('tecnicoLocation'),
+                          position: _tecnicoLocalizacao!,
+                          infoWindow: InfoWindow(
+                            title: 'Seu Local',
+                          ),
+                        )
+                      },
+                      onMapCreated: (controller) {
+                        _mapController = controller;
+                      },
+                      myLocationEnabled: false,
+                      zoomGesturesEnabled: false,
+                      scrollGesturesEnabled: false,
+                      rotateGesturesEnabled: false,
+                      zoomControlsEnabled: false, // Desativa os botões de zoom
+                      mapToolbarEnabled: false,
+                    ),
+                  ),
                 ),
     );
   }

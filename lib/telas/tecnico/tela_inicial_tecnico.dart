@@ -174,7 +174,7 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                     builder: (context) => AtendimentosAgendadosTecnico()),
               );
             }, Colors.white),
-            _buildMenuItem("Deslogar", Icons.logout, () => _deslogar(context),
+            _buildMenuItem("Sair", Icons.logout, () => _deslogar(context),
                 Colors.white),
           ],
         ),
