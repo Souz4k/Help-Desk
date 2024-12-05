@@ -194,30 +194,15 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
         return true;
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: Text("Técnicos em sua Região"),
+          backgroundColor: Colors.blueAccent,
+          centerTitle: true,
+        ),
         body: Center(
           child: _isLoading
               ? CircularProgressIndicator()
               : _widgetOptions.elementAt(_selectedIndex),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: MinhasCores.brancogelo,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Voltar',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Mapa',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Configurações',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.blue,
-          onTap: _onItemTapped,
         ),
       ),
     );
