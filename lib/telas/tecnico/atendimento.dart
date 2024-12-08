@@ -71,8 +71,12 @@ class _AtendimentosAgendadosTecnicoState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Atendimentos Agendados Técnico'),
-        backgroundColor: MinhasCores.azulEscuro,
+        title: const Text(
+          'Atendimentos',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore

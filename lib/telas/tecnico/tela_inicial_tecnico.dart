@@ -149,10 +149,17 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                     builder: (context) => AdicionarHorarioScreen()),
               );
             }, Colors.white),
-            _buildMenuItem("Agendamentos na Região", Icons.location_on, () {
+            // _buildMenuItem("Agendamentos na Região", Icons.location_on, () {
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(builder: (context) => Geolocalizacao()),
+            //   );
+            // }, Colors.white),
+            _buildMenuItem("Atendimentos", Icons.headset_mic, () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Geolocalizacao()),
+                MaterialPageRoute(
+                    builder: (context) => AtendimentosAgendadosTecnico()),
               );
             }, Colors.white),
             _buildMenuItem("Informações", Icons.person, () {
@@ -161,15 +168,8 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                 MaterialPageRoute(builder: (context) => AlterarInfotec()),
               );
             }, Colors.white),
-            _buildMenuItem("Atendimentos", Icons.headset_mic, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AtendimentosAgendadosTecnico()),
-              );
-            }, Colors.white),
-            _buildMenuItem("Sair", Icons.logout, () => _deslogar(context),
-                Colors.white),
+            _buildMenuItem(
+                "Sair", Icons.logout, () => _deslogar(context), Colors.white),
           ],
         ),
       ),
