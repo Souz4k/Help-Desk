@@ -195,7 +195,10 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Técnicos em sua Região"),
+          title: Text(
+            "Técnicos em sua Região",
+            style: TextStyle(color: Colors.white),
+          ),
           backgroundColor: Colors.blueAccent,
           centerTitle: true,
         ),
