@@ -149,12 +149,6 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                     builder: (context) => AdicionarHorarioScreen()),
               );
             }, Colors.white),
-            _buildMenuItem("Suporte", Icons.help_outline, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Suporte()),
-              );
-            }, Colors.white),
             _buildMenuItem("Agendamentos na Região", Icons.location_on, () {
               Navigator.push(
                 context,
@@ -167,7 +161,7 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                 MaterialPageRoute(builder: (context) => AlterarInfotec()),
               );
             }, Colors.white),
-            _buildMenuItem("atendimentos", Icons.person, () {
+            _buildMenuItem("Atendimentos", Icons.headset_mic, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
