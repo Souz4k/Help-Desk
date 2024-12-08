@@ -264,13 +264,13 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
         );
         await _user!.reauthenticateWithCredential(credential);
 
-        if (newName.isNotEmpty && newName != _nomeAtual) {
+        if (newName.isNotEmpty) {
           await _user!.updateDisplayName(newName);
           _nomeAtual = newName;
           await FirebaseFirestore.instance
               .collection('users')
               .doc(_user!.uid)
-              .update({'name': newName});
+              .update({'nome': newName});
         }
         if (newSenha.isNotEmpty) {
           await _user!.updatePassword(newSenha);
