@@ -116,33 +116,36 @@ class _AlterarInfoCliState extends State<AlterarInfoCli> {
       String newSenha, String celular) async {
     try {
       if (_user != null) {
+        // Reautenticação
         var credential = EmailAuthProvider.credential(
           email: _user!.email!,
           password: oldPassword,
         );
         await _user!.reauthenticateWithCredential(credential);
 
-        // Atualiza o nome, se necessário
-        if (newName.isNotEmpty && newName != _nomeAtual) {
+        // Atualiza o nome no Firebase Auth e Firestore
+        if (newName.isNotEmpty) {
           await _user!.updateDisplayName(newName);
           _nomeAtual = newName;
+
+          // Atualizando o nome no Firestore
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(_user!.uid)
+              .update({'nome': newName});
         }
+
         // Atualiza a senha, se fornecida
         if (newSenha.isNotEmpty) {
           await _user!.updatePassword(newSenha);
         }
 
         // Atualiza o celular, se fornecido
-        Map<String, String> updateData = {};
         if (celular.isNotEmpty) {
-          updateData['celular'] = celular;
-        }
-
-        if (updateData.isNotEmpty) {
           await FirebaseFirestore.instance
               .collection('users')
               .doc(_user!.uid)
-              .set(updateData, SetOptions(merge: true));
+              .update({'celular': celular});
         }
 
         _showSuccessDialog();
