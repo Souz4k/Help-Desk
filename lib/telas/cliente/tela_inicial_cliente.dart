@@ -156,12 +156,7 @@ class telaInicialClienteState extends State<telaInicialCliente> {
                     builder: (context) => AtendimentosAgendados()),
               );
             }),
-            _buildMenuItem("Suporte", Icons.help_outline, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Suporte()),
-              );
-            }),
+        
             _buildMenuItem("Técnicos em sua Região", Icons.location_on, () {
               Navigator.push(
                 context,
