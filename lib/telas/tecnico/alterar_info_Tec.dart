@@ -550,7 +550,16 @@ class _AlterarInfotecState extends State<AlterarInfotec> {
               _isLoading
                   ? Center(child: CircularProgressIndicator())
                   : _tecnicoLocalizacao == null
-                      ? Center(child: Text('Localização não definida'))
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(height: 30),
+                              Text('Localização não definida'),
+                              SizedBox(height: 30),
+                            ],
+                          ),
+                        )
                       : Container(
                           height: 200, // Define a altura do bloco
                           width: 300,
