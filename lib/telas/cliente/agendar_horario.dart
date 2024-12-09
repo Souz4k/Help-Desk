@@ -156,6 +156,7 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
@@ -163,10 +164,14 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Pesquisar Técnico',
-                prefixIcon: Icon(Icons.search),
+                labelText: 'Pesquisar por técnico',
+                labelStyle: const TextStyle(color: Colors.black54),
+                prefixIcon: const Icon(Icons.search, color: Colors.black54),
+                filled: true,
+                fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
@@ -463,6 +468,7 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
       ),
+      backgroundColor: Colors.white,
       body: horarios.isEmpty
           ? Center(
               child: Text(
