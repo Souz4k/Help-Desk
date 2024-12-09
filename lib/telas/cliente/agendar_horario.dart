@@ -75,30 +75,46 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
     });
   }
 
-  void _showTecnicoDetails(Map<String, dynamic> tecnico) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  "Detalhes do Técnico",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  overflow: TextOverflow.visible,
-                ),
+  void _showTecnicoDetails(Map<String, dynamic> tecnico) async {
+  // Buscar os diplomas do técnico
+  List<String> diplomaUrls = [];
+  try {
+    var diplomasDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(tecnico['uid'])
+        .collection('diplomas')
+        .get();
+
+    if (diplomasDoc.docs.isNotEmpty) {
+      diplomaUrls = diplomasDoc.docs.map((doc) => doc['url'] as String).toList();
+    }
+  } catch (e) {
+    print('Erro ao buscar diplomas: $e');
+  }
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                "Detalhes do Técnico",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                overflow: TextOverflow.visible,
               ),
-              IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-          content: Column(
+            ),
+            IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               tecnico['fotoUrl'].isNotEmpty
@@ -117,6 +133,61 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
               Text(tecnico['celular'],
                   style: TextStyle(color: Colors.grey[600])),
               SizedBox(height: 20),
+              
+              // Seção de Diplomas
+              if (diplomaUrls.isNotEmpty) ...[
+                Text(
+                  "Diplomas",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: diplomaUrls.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        // Opção para ampliar a imagem se necessário
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              child: GestureDetector(
+                                onTap: () => Navigator.of(context).pop(),
+                                child: Image.network(
+                                  diplomaUrls[index],
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            diplomaUrls[index],
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 20),
+              ],
+              
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -134,10 +205,11 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
               ),
             ],
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   void _onTecnicoSelected(Map<String, dynamic> tecnico) {
     Navigator.push(
