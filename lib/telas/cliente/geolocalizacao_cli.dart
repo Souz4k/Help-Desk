@@ -27,6 +27,12 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
     _determineAndSavePosition();
   }
 
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
   Future<void> _determineAndSavePosition() async {
     try {
       Position position = await _determinePosition();
@@ -51,7 +57,7 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
             'longitude': position.longitude,
           },
           'userType': userType,
-          'name': user.displayName ?? 'Sem Nome',
+          'nome': user.displayName ?? 'Sem Nome',
         }, SetOptions(merge: true));
 
         _addMarker(
@@ -129,7 +135,7 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
         _addMarker(
           LatLng(location['latitude'], location['longitude']),
           user.id,
-          data['name'] ?? 'Sem Nome',
+          data['nome'] ?? 'Sem Nome',
         );
       }
     });
@@ -188,25 +194,19 @@ class _GeolocalizacaoState extends State<Geolocalizacao> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        _determineAndSavePosition();
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Técnicos em sua Região",
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blueAccent,
-          centerTitle: true,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Técnicos em sua Região",
+          style: TextStyle(color: Colors.white),
         ),
-        body: Center(
-          child: _isLoading
-              ? CircularProgressIndicator()
-              : _widgetOptions.elementAt(_selectedIndex),
-        ),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
+      ),
+      body: Center(
+        child: _isLoading
+            ? CircularProgressIndicator()
+            : _widgetOptions.elementAt(_selectedIndex),
       ),
     );
   }
