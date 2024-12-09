@@ -4,6 +4,8 @@ import 'package:app/telas/cliente/tela_inicial_cliente.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class SelecionarTecnicoScreen extends StatefulWidget {
   @override
@@ -14,6 +16,12 @@ class SelecionarTecnicoScreen extends StatefulWidget {
 class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
   List<Map<String, dynamic>> tecnicos = [];
   User? user;
+  final maskFormatter = MaskTextInputFormatter(
+    mask: '(##)#####-####',
+    filter: {
+      "#": RegExp(r'[0-9]'), // Permite apenas números
+    },
+  );
 
   @override
   void initState() {
@@ -195,6 +203,7 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
         nome: data['nome'],
         configuracao: data['configuracao'],
         problema: data['problema'],
+        contato: data['contato'],
       );
     }).toList();
 
@@ -220,11 +229,40 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
     );
   }
 
+  Widget _buildCellphoneField(
+      TextEditingController controller, String labelText, bool obscureText) {
+    final maskFormatter = MaskTextInputFormatter(
+      mask: '(##)#####-####',
+      filter: {
+        "#": RegExp(r'[0-9]'), // Permite apenas números
+      },
+    );
+
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: 'Celular',
+        labelStyle: TextStyle(color: Colors.black),
+        border: OutlineInputBorder(),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blueAccent)),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      keyboardType: TextInputType.phone,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly, // Permite apenas dígitos
+        maskFormatter, // Aplica a máscara
+      ],
+    );
+  }
+
   void _showConfirmationDialog(Horario horario) {
     final _nomeController = TextEditingController(text: horario.nome);
     final _configuracaoController =
         TextEditingController(text: horario.configuracao);
     final _problemaController = TextEditingController(text: horario.problema);
+    final _contatoController = TextEditingController(text: horario.contato);
 
     showDialog(
       context: context,
@@ -266,6 +304,9 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
                     _configuracaoController, "Configuração do Aparelho", false),
                 SizedBox(height: 20),
                 _buildTextField(_problemaController, "Problema", false),
+                SizedBox(height: 20),
+                _buildCellphoneField(
+                    _contatoController, "Telefone para Contato", false),
               ],
             ),
           ),
@@ -292,6 +333,7 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
                   'nome': _nomeController.text,
                   'configuracao': _configuracaoController.text,
                   'problema': _problemaController.text,
+                  'contato': _contatoController.text,
                   'disponivel': false,
                   'agendamentoId': agendamentoId,
                   'uidUsuario': FirebaseAuth.instance.currentUser?.uid ?? "",
@@ -350,11 +392,12 @@ class _DetalhesTecnicoScreenState extends State<DetalhesTecnicoScreen> {
               child: TextButton(
                 child: Text("Ok"),
                 onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => telaInicialCliente()),
-                );
-              },
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => telaInicialCliente()),
+                  );
+                },
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.green, // Cor de fundo do botão
                   foregroundColor: Colors.white, // Cor do texto

@@ -43,6 +43,7 @@ class _AtendimentosAgendadosTecnicoState
           'problema': FieldValue.delete(),
           'hora': FieldValue.delete(),
           'uidUsuario': FieldValue.delete(),
+          'contato': FieldValue.delete(),
         });
       } else {
         // Apenas atualiza o status para aceito
@@ -117,6 +118,7 @@ class _AtendimentosAgendadosTecnicoState
                   ? dados['hora'].toString()
                   : 'Sem horário';
               final String status = dados['status'] ?? 'Indefinido';
+              final String contato = dados['contato'] ?? 'Indefinido';
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -131,6 +133,7 @@ class _AtendimentosAgendadosTecnicoState
                       Text('Problema: $problema'),
                       Text('Horário: $hora'),
                       Text('Status: $status'),
+                      Text('Contato: $contato'),
                     ],
                   ),
                   trailing: Row(

@@ -5,6 +5,7 @@ class Horario {
   String? nome;
   String? configuracao;
   String? problema;
+  String? contato;
 
   Horario({
     required this.id,
@@ -13,5 +14,6 @@ class Horario {
     this.nome,
     this.configuracao,
     this.problema,
+    this.contato,
   });
 }
