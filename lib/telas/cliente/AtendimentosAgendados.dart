@@ -57,17 +57,21 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
         }
 
         // Verifica se o campo 'agendamentoId' está presente e converte para DateTime
-        if (data.containsKey('agendamentoId') && data['agendamentoId'] != null) {
+        if (data.containsKey('agendamentoId') &&
+            data['agendamentoId'] != null) {
           try {
             // Extraímos os milissegundos da string e convertemos para DateTime
             int agendamentoMilissegundos = int.parse(data['agendamentoId']);
-            data['horaMarcada'] = DateTime.fromMillisecondsSinceEpoch(agendamentoMilissegundos);
+            data['horaMarcada'] =
+                DateTime.fromMillisecondsSinceEpoch(agendamentoMilissegundos);
           } catch (e) {
             print('Erro ao converter agendamentoId para DateTime: $e');
-            data['horaMarcada'] = DateTime.now(); // Caso falhe, usa a hora atual
+            data['horaMarcada'] =
+                DateTime.now(); // Caso falhe, usa a hora atual
           }
         } else {
-          data['horaMarcada'] = DateTime.now(); // Se não tiver agendamentoId, define como a hora atual
+          data['horaMarcada'] = DateTime
+              .now(); // Se não tiver agendamentoId, define como a hora atual
         }
 
         agendamentos.add(data);
@@ -161,8 +165,8 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
 
                         // Obter horaMarcada como DateTime
                         DateTime horaMarcada = agendamento['horaMarcada'];
-                        String dataFormatada = DateFormat('dd/MM/yyyy HH:mm')
-                            .format(horaMarcada);
+                        String dataFormatada =
+                            DateFormat('dd/MM/yyyy HH:mm').format(horaMarcada);
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16),
@@ -243,6 +247,7 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
                                   ],
                                 ),
                               ),
+
                               const SizedBox(height: 8),
 
                               // Hora Marcada
@@ -257,6 +262,25 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
                                   children: [
                                     TextSpan(
                                       text: dataFormatada,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              RichText(
+                                text: TextSpan(
+                                  text: "Telefone Usado no Contato: ",
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: agendamento['contato'] ?? 'N/A',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.normal,
                                       ),
