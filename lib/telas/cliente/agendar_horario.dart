@@ -15,6 +15,7 @@ class SelecionarTecnicoScreen extends StatefulWidget {
 
 class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
   List<Map<String, dynamic>> tecnicos = [];
+  List<Map<String, dynamic>> filteredTecnicos = [];
   User? user;
   final maskFormatter = MaskTextInputFormatter(
     mask: '(##)#####-####',
@@ -22,12 +23,30 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
       "#": RegExp(r'[0-9]'), // Permite apenas números
     },
   );
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _getCurrentUser();
     _fetchTecnicos();
+    _searchController.addListener(_filterTecnicos);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterTecnicos() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredTecnicos = tecnicos.where((tecnico) {
+        final nome = tecnico['nome'].toLowerCase();
+        return nome.contains(query);
+      }).toList();
+    });
   }
 
   Future<void> _getCurrentUser() async {
@@ -52,6 +71,7 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
 
     setState(() {
       tecnicos = fetchedTecnicos;
+      filteredTecnicos = fetchedTecnicos;
     });
   }
 
@@ -138,32 +158,50 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: ListView.builder(
-          itemCount: tecnicos.length,
-          itemBuilder: (context, index) {
-            final tecnico = tecnicos[index];
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 8),
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
-              child: ListTile(
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                leading: tecnico['fotoUrl'].isNotEmpty
-                    ? CircleAvatar(
-                        backgroundImage: NetworkImage(tecnico['fotoUrl']),
-                        radius: 25,
-                      )
-                    : CircleAvatar(
-                        child: Icon(Icons.person, size: 30),
-                        radius: 25,
-                      ),
-                title: Text(tecnico['nome'], style: TextStyle(fontSize: 18)),
-                onTap: () => _showTecnicoDetails(tecnico),
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Pesquisar Técnico',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-            );
-          },
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredTecnicos.length,
+                itemBuilder: (context, index) {
+                  final tecnico = filteredTecnicos[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    child: ListTile(
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      leading: tecnico['fotoUrl'].isNotEmpty
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(tecnico['fotoUrl']),
+                              radius: 25,
+                            )
+                          : CircleAvatar(
+                              child: Icon(Icons.person, size: 30),
+                              radius: 25,
+                            ),
+                      title:
+                          Text(tecnico['nome'], style: TextStyle(fontSize: 18)),
+                      onTap: () => _showTecnicoDetails(tecnico),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
