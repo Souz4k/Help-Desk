@@ -141,7 +141,7 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            _buildMenuItem("Agendamento", Icons.calendar_today, () {
+            _buildMenuItem("Definir Disponibilidade", Icons.calendar_today, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -154,7 +154,7 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
             //     MaterialPageRoute(builder: (context) => Geolocalizacao()),
             //   );
             // }, Colors.white),
-            _buildMenuItem("Atendimentos", Icons.headset_mic, () {
+            _buildMenuItem("Chamados", Icons.headset_mic, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(

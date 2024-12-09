@@ -168,11 +168,23 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
                         String dataFormatada =
                             DateFormat('dd/MM/yyyy HH:mm').format(horaMarcada);
 
+                        // Definir a cor do card com base no status
+                        Color cardColor;
+                        String? status = agendamento[
+                            'status']; // Assumindo que o campo status existe
+                        if (status == 'aceito') {
+                          cardColor = Colors.green[100]!;
+                        } else if (status == 'recusado') {
+                          cardColor = Colors.red[100]!;
+                        } else {
+                          cardColor = Colors.white; // Branco para status null
+                        }
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.black12,
+                            color: cardColor,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.grey[300]!),
                             boxShadow: [
@@ -247,7 +259,6 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
                                   ],
                                 ),
                               ),
-
                               const SizedBox(height: 8),
 
                               // Hora Marcada
@@ -270,6 +281,8 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
                                 ),
                               ),
                               const SizedBox(height: 8),
+
+                              // Telefone Usado no Contato
                               RichText(
                                 text: TextSpan(
                                   text: "Telefone Usado no Contato: ",
@@ -286,6 +299,23 @@ class _AtendimentosAgendadosState extends State<AtendimentosAgendados> {
                                       ),
                                     ),
                                   ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Status
+                              Text(
+                                status != null
+                                    ? "Status: ${status[0].toUpperCase()}${status.substring(1)}"
+                                    : "Status: Aguardando confirmação...",
+                                style: TextStyle(
+                                  color: status == 'aceito'
+                                      ? Colors.green
+                                      : status == 'recusado'
+                                          ? Colors.red
+                                          : Colors
+                                              .orange, // Cor laranja para 'aguardando confirmação'
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],

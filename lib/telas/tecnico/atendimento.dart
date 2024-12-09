@@ -35,15 +35,16 @@ class _AtendimentosAgendadosTecnicoState
       final docRef = _firestore.collection('horarios').doc(horarioId);
 
       if (novoStatus == 'recusado') {
-        // Atualiza o status e torna o horário disponível novamente
+        // Atualiza o status, remove o uidTecnico e torna o horário disponível novamente
         await docRef.update({
           'status': novoStatus,
           'disponivel': true,
-          'nome': FieldValue.delete(),
-          'problema': FieldValue.delete(),
-          'hora': FieldValue.delete(),
-          'uidUsuario': FieldValue.delete(),
-          'contato': FieldValue.delete(),
+          // 'uidTecnico': FieldValue.delete(), // Remove o técnico associado
+          // 'nome': FieldValue.delete(),
+          // 'problema': FieldValue.delete(),
+          // 'hora': FieldValue.delete(),
+          // 'uidUsuario': FieldValue.delete(),
+          // 'contato': FieldValue.delete(),
         });
       } else {
         // Apenas atualiza o status para aceito
