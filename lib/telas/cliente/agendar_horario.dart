@@ -46,7 +46,7 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
         'uid': doc.id,
         'nome': data['nome'] ?? 'Nome não disponível',
         'celular': data['celular'] ?? 'celular não disponível',
-        'fotoUrl': data['fotoUrl'] ?? ''
+        'fotoUrl': data['fotourl'] ?? ''
       };
     }).toList();
 
@@ -83,8 +83,8 @@ class _SelecionarTecnicoScreenState extends State<SelecionarTecnicoScreen> {
             children: [
               tecnico['fotoUrl'].isNotEmpty
                   ? CircleAvatar(
-                      backgroundImage: NetworkImage(tecnico['fotoUrl']),
-                      radius: 50,
+                      backgroundImage: NetworkImage(tecnico['fotoUrl']!),
+                      radius: 60,
                     )
                   : CircleAvatar(
                       child: Icon(Icons.person, size: 50),
