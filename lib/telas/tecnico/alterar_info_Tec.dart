@@ -1,4 +1,3 @@
-import 'package:app/telas/tecnico/a.dart';
 import 'package:app/telas/tecnico/tela_inicial_tecnico.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';

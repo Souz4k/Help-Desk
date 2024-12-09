@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
-import 'package:app/telas/AjudaTecnica.dart';
-import 'package:app/telas/AtendimentosAgendados.dart';
-import 'package:app/telas/HistoricoCliente.dart';
+import 'package:app/telas/cliente/AtendimentosAgendados.dart';
 import 'package:app/telas/cliente/agendar_horario.dart';
 import 'package:app/telas/cliente/alterar_Info_Cli.dart';
 import 'package:app/telas/cliente/geolocalizacao_cli.dart';
-import 'package:app/telas/suporte.dart';
 import 'package:app/telas/Tela_inicial.dart';
 
 class telaInicialCliente extends StatefulWidget {

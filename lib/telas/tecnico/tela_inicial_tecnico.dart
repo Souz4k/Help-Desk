@@ -3,7 +3,6 @@ import 'package:app/telas/cliente/geolocalizacao_cli.dart';
 import 'package:app/telas/tecnico/atendimento.dart';
 import 'package:flutter/material.dart';
 import 'package:app/telas/tecnico/adicionar_horario.dart';
-import 'package:app/telas/suporte.dart';
 import 'package:app/telas/tecnico/alterar_info_Tec.dart';
 import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
