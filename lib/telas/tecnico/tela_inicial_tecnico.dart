@@ -1,10 +1,9 @@
 import 'package:app/telas/Tela_inicial.dart';
-import 'package:app/telas/cliente/geolocalizacao_cli.dart';
 import 'package:app/telas/tecnico/atendimento.dart';
 import 'package:flutter/material.dart';
+import 'package:app/telas/tecnico/historico.dart';
 import 'package:app/telas/tecnico/adicionar_horario.dart';
 import 'package:app/telas/tecnico/alterar_info_Tec.dart';
-import 'package:app/_comum/minhas_cores.dart';
 import 'package:app/servicos/autenticacao_servico.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -148,17 +147,19 @@ class _Tela_inicial_tecnicoState extends State<Tela_inicial_tecnico> {
                     builder: (context) => AdicionarHorarioScreen()),
               );
             }, Colors.white),
-            // _buildMenuItem("Agendamentos na Região", Icons.location_on, () {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => Geolocalizacao()),
-            //   );
-            // }, Colors.white),
+            
             _buildMenuItem("Chamados", Icons.headset_mic, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => AtendimentosAgendadosTecnico()),
+              );
+            }, Colors.white),
+            _buildMenuItem("Historico", Icons.history, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AtendimentosTecnico()),
               );
             }, Colors.white),
             _buildMenuItem("Informações", Icons.person, () {

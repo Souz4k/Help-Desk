@@ -39,12 +39,6 @@ class _AtendimentosAgendadosTecnicoState
         await docRef.update({
           'status': novoStatus,
           'disponivel': true,
-          // 'uidTecnico': FieldValue.delete(), // Remove o técnico associado
-          // 'nome': FieldValue.delete(),
-          // 'problema': FieldValue.delete(),
-          // 'hora': FieldValue.delete(),
-          // 'uidUsuario': FieldValue.delete(),
-          // 'contato': FieldValue.delete(),
         });
       } else {
         // Apenas atualiza o status para aceito
@@ -118,6 +112,7 @@ class _AtendimentosAgendadosTecnicoState
               final String hora = dados['hora'] != null
                   ? dados['hora'].toString()
                   : 'Sem horário';
+              final String aparelho = dados['configuracao'] ?? 'Indefinido';
               final String status = dados['status'] ?? 'Indefinido';
               final String contato = dados['contato'] ?? 'Indefinido';
 
@@ -131,6 +126,7 @@ class _AtendimentosAgendadosTecnicoState
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text('Aparelho: $aparelho'),
                       Text('Problema: $problema'),
                       Text('Horário: $hora'),
                       Text('Status: $status'),
